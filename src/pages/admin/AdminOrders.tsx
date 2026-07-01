@@ -1,6 +1,15 @@
 import { useEffect, useState } from 'react';
 import type { Order } from '../../types';
-import { supabase } from '../../lib/supabase';
+import { supabase, supabaseSetupMessage } from '../../lib/supabase';
+
+const orderStatuses = ['pending', 'processing', 'completed', 'cancelled'] as const;
+
+function getStatusClass(status: string) {
+  if (status === 'completed') return 'bg-[#25D366]/10 text-[#25D366]';
+  if (status === 'processing') return 'bg-blue-100 text-blue-800';
+  if (status === 'cancelled') return 'bg-red-100 text-red-700';
+  return 'bg-yellow-100 text-yellow-800';
+}
 
 export function AdminOrders() {
   const [orders, setOrders] = useState<Order[]>([]);
@@ -11,7 +20,7 @@ export function AdminOrders() {
     const loadOrders = async () => {
       if (!supabase) {
         setIsLoading(false);
-        setError('Supabase env values are missing.');
+        setError(supabaseSetupMessage || 'Supabase is not configured yet.');
         return;
       }
 
@@ -30,6 +39,26 @@ export function AdminOrders() {
 
     loadOrders();
   }, []);
+
+  const handleStatusChange = async (orderId: string, status: string) => {
+    if (!supabase) return;
+
+    setError('');
+    const previousOrders = orders;
+    setOrders((currentOrders) =>
+      currentOrders.map((order) => (order.id === orderId ? { ...order, status } : order))
+    );
+
+    const { error: updateError } = await supabase
+      .from('orders')
+      .update({ status })
+      .eq('id', orderId);
+
+    if (updateError) {
+      setOrders(previousOrders);
+      setError(updateError.message);
+    }
+  };
 
   return (
     <div>
@@ -114,13 +143,17 @@ export function AdminOrders() {
                         Rs. {Number(order.total).toLocaleString()}
                       </td>
                       <td className="whitespace-nowrap px-3 py-4 text-sm">
-                        <span className={`inline-flex rounded-md px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${
-                          order.status === 'completed' ? 'bg-[#25D366]/10 text-[#25D366]' :
-                          order.status === 'processing' ? 'bg-blue-100 text-blue-800' :
-                          'bg-yellow-100 text-yellow-800'
-                        }`}>
-                          {order.status}
-                        </span>
+                        <select
+                          value={order.status}
+                          onChange={(event) => handleStatusChange(order.id, event.target.value)}
+                          className={`rounded-md border border-transparent px-2 py-1 text-[10px] font-bold uppercase tracking-wider outline-none ${getStatusClass(order.status)}`}
+                        >
+                          {orderStatuses.map((status) => (
+                            <option key={status} value={status}>
+                              {status}
+                            </option>
+                          ))}
+                        </select>
                       </td>
                     </tr>
                   ))}

@@ -105,8 +105,8 @@ function productToRow(product: ProductInput) {
 }
 
 export const useProductStore = create<ProductState>()((set, get) => ({
-  products: mockProducts,
-  categories: fallbackCategoryRecords,
+  products: hasSupabaseConfig ? [] : mockProducts,
+  categories: hasSupabaseConfig ? [] : fallbackCategoryRecords,
   isLoading: false,
   error: null,
   isUsingFallback: !hasSupabaseConfig,
@@ -136,9 +136,9 @@ export const useProductStore = create<ProductState>()((set, get) => ({
 
     if (categoryError || productError) {
       set({
-        products: mockProducts,
-        categories: fallbackCategoryRecords,
-        isUsingFallback: true,
+        products: [],
+        categories: [],
+        isUsingFallback: false,
         isLoading: false,
         error: categoryError?.message || productError?.message || 'Could not load products.',
       });
@@ -177,9 +177,9 @@ export const useProductStore = create<ProductState>()((set, get) => ({
 
     if (categoryError || productError) {
       set({
-        products: mockProducts,
-        categories: fallbackCategoryRecords,
-        isUsingFallback: true,
+        products: [],
+        categories: [],
+        isUsingFallback: false,
         isLoading: false,
         error: categoryError?.message || productError?.message || 'Could not load admin products.',
       });

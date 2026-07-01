@@ -2,6 +2,7 @@ import { useEffect, useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Cpu, Mail, Lock, ArrowRight, Eye, EyeOff } from 'lucide-react';
 import { useAdminAuthStore } from '../../store/adminAuthStore';
+import { hasSupabaseConfig, supabaseSetupMessage } from '../../lib/supabase';
 
 export function AdminLogin() {
   const [email, setEmail] = useState('');
@@ -14,6 +15,7 @@ export function AdminLogin() {
   const isAuthenticated = useAdminAuthStore((state) => state.isAuthenticated);
   const isLoading = useAdminAuthStore((state) => state.isLoading);
   const authError = useAdminAuthStore((state) => state.error);
+  const setupMessage = hasSupabaseConfig ? null : supabaseSetupMessage;
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -133,7 +135,22 @@ export function AdminLogin() {
               </div>
             </div>
 
-            {(error || authError) && (
+            {setupMessage && (
+              <div style={{
+                background: 'rgba(245,158,11,0.1)',
+                border: '1px solid rgba(245,158,11,0.25)',
+                borderRadius: '0.625rem',
+                padding: '0.75rem 1rem',
+                fontSize: '0.8rem',
+                color: '#b45309',
+                fontWeight: 600,
+                lineHeight: 1.5,
+              }}>
+                {setupMessage}
+              </div>
+            )}
+
+            {(error || (!setupMessage && authError)) && (
               <div style={{
                 background: 'rgba(239,68,68,0.08)',
                 border: '1px solid rgba(239,68,68,0.2)',
@@ -151,8 +168,8 @@ export function AdminLogin() {
               id="admin-login-btn"
               type="submit"
               className="btn-glow"
-              disabled={isLoading}
-              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', marginTop: '0.25rem', opacity: isLoading ? 0.7 : 1 }}
+              disabled={isLoading || Boolean(setupMessage)}
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', marginTop: '0.25rem', opacity: isLoading || setupMessage ? 0.7 : 1 }}
             >
               {isLoading ? 'Signing in...' : 'Sign In'} <ArrowRight size={15} />
             </button>

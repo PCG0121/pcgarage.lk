@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import type { User } from '@supabase/supabase-js';
-import { hasSupabaseConfig, supabase } from '../lib/supabase';
+import { hasSupabaseConfig, supabase, supabaseSetupMessage } from '../lib/supabase';
 
 interface AdminAuthState {
   isAuthenticated: boolean;
@@ -35,7 +35,7 @@ export const useAdminAuthStore = create<AdminAuthState>()((set) => ({
 
   initialize: async () => {
     if (!supabase) {
-      set({ isAuthenticated: false, user: null, email: null, isLoading: false, error: 'Supabase env values are missing.' });
+      set({ isAuthenticated: false, user: null, email: null, isLoading: false, error: supabaseSetupMessage });
       return;
     }
 
@@ -69,7 +69,7 @@ export const useAdminAuthStore = create<AdminAuthState>()((set) => ({
   },
 
   login: async (email, password) => {
-    if (!supabase) throw new Error('Supabase env values are missing.');
+    if (!supabase) throw new Error(supabaseSetupMessage || 'Supabase is not configured yet.');
 
     set({ isLoading: true, error: null });
     const { data, error } = await supabase.auth.signInWithPassword({ email, password });

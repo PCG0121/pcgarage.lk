@@ -116,7 +116,7 @@ export function AdminProducts() {
           </p>
           {isUsingFallback && (
             <p className="mt-2 text-xs font-bold text-amber-600">
-              Supabase env values are missing or unavailable, so demo fallback data is showing.
+              Supabase is not configured yet, so demo fallback data is showing. Create .env.local in the project root to connect live products.
             </p>
           )}
         </div>

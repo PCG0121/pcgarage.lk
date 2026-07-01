@@ -28,7 +28,7 @@ Install project dependencies:
 npm install
 ```
 
-Create a local environment file:
+Create a local environment file in the project root, at the same level as `package.json`:
 
 ```bash
 cp .env.example .env.local
@@ -43,14 +43,16 @@ Copy-Item .env.example .env.local
 Update `.env.local` with your values:
 
 ```env
-VITE_SUPABASE_URL="YOUR_SUPABASE_URL"
-VITE_SUPABASE_ANON_KEY="YOUR_SUPABASE_ANON_KEY"
+VITE_SUPABASE_URL="https://your-project-ref.supabase.co"
+VITE_SUPABASE_ANON_KEY="your-anon-public-key"
 VITE_WHATSAPP_NUMBER="94700000000"
 ```
 
 `VITE_WHATSAPP_NUMBER` must use country code format without `+`, spaces, or dashes. Example: `94771234567`.
 
-The app uses Supabase when `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` are configured. If they are missing, public product screens fall back to demo data from `src/data/mock.ts` for local preview only.
+The app uses Supabase when `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` are configured in `.env.local`. If they are missing, public product screens fall back to demo data from `src/data/mock.ts` for local preview only, and admin screens show a setup message instead of trying to sign in.
+
+After creating or changing `.env.local`, restart the Vite dev server. Vite reads environment variables when the server starts.
 
 ## Run Locally
 
@@ -121,7 +123,7 @@ Admin login uses Supabase Auth. A user can access admin pages only when their Au
 
 ## Supabase Setup
 
-Create `.env.local` from `.env.example`:
+Create `.env.local` from `.env.example` in the project root, at the same level as `package.json`:
 
 ```powershell
 Copy-Item .env.example .env.local
@@ -137,7 +139,17 @@ VITE_WHATSAPP_NUMBER="94771234567"
 
 Do not put the Supabase `service_role` key in this frontend app.
 
-Create the database tables, seed categories/products, enable RLS, and create the optional public `product-images` Storage bucket by running:
+The committed `.env.example` intentionally leaves these values blank:
+
+```env
+VITE_SUPABASE_URL=
+VITE_SUPABASE_ANON_KEY=
+VITE_WHATSAPP_NUMBER=
+```
+
+Copy it to `.env.local`, fill in the real values, then restart `npm run dev`.
+
+Create the database tables, seed categories/products, enable RLS, and install the safe access policies by running:
 
 ```text
 supabase/schema.sql
@@ -156,7 +168,7 @@ insert into public.admin_users (user_id, email)
 values ('AUTH_USER_UUID_HERE', 'admin@pcgarage.lk');
 ```
 
-Products are stored in Supabase `products`, categories in `categories`, and checkout orders in `orders`. Product images should be hosted as public URLs, for example in the `product-images` Supabase Storage bucket. The app saves only `products.image_url`, not base64 image data.
+Products are stored in Supabase `products`, categories in `categories`, and checkout orders in `orders`. Product images should be hosted as public URLs. The app saves only `products.image_url`, not base64 image data.
 
 ## Cloudflare Pages Deployment
 
