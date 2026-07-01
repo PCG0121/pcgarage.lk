@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { useEffect } from 'react';
 import { useProductStore } from '../store/productStore';
 import {
-  Laptop, Monitor, Keyboard, Battery, Zap, HardDrive, Cpu, Printer, ArrowRight
+  Laptop, Monitor, Keyboard, Battery, Zap, HardDrive, Cpu, Printer, ArrowRight, AlertCircle, LoaderCircle
 } from 'lucide-react';
 
 const categoryIcons: Record<string, any> = {
@@ -30,6 +30,8 @@ const categoryColors: Record<string, { bg: string; border: string; text: string;
 export function Categories() {
   const products = useProductStore((state) => state.products);
   const categories = useProductStore((state) => state.categories.map((category) => category.name));
+  const isLoading = useProductStore((state) => state.isLoading);
+  const error = useProductStore((state) => state.error);
   const loadProducts = useProductStore((state) => state.loadProducts);
 
   useEffect(() => {
@@ -58,65 +60,109 @@ export function Categories() {
 
       {/* Categories Grid */}
       <div style={{ maxWidth: '80rem', margin: '0 auto', padding: '3rem 1.5rem 4rem' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: '1.25rem' }}>
-          {categories.map((catName) => {
-            const Icon = categoryIcons[catName] || Laptop;
-            const colors = categoryColors[catName] || { bg: 'rgba(239,68,68,0.1)', border: 'rgba(239,68,68,0.2)', text: '#ef4444', glow: 'rgba(239,68,68,0.1)' };
-            const count = products.filter((p) => p.category === catName).length;
+        {error && (
+          <div
+            role="alert"
+            style={{
+              display: 'flex',
+              alignItems: 'flex-start',
+              gap: '0.75rem',
+              background: '#fff7ed',
+              border: '1px solid #fed7aa',
+              color: '#9a3412',
+              borderRadius: '0.875rem',
+              padding: '0.875rem 1rem',
+              marginBottom: '1.5rem',
+              fontSize: '0.85rem',
+              fontWeight: 650,
+              lineHeight: 1.5,
+            }}
+          >
+            <AlertCircle size={18} style={{ flexShrink: 0, marginTop: '0.1rem' }} />
+            <div>
+              <div style={{ color: '#7c2d12', fontWeight: 800, marginBottom: '0.1rem' }}>Categories could not be loaded</div>
+              <div>Please refresh the page or check the Supabase deployment environment variables.</div>
+            </div>
+          </div>
+        )}
 
-            return (
-              <Link
-                key={catName}
-                to={`/products?category=${catName}`}
-                style={{
-                  display: 'flex', alignItems: 'center', gap: '1.25rem',
-                  padding: '1.5rem',
-                  background: 'var(--bg-card)',
-                  border: '1px solid var(--border-subtle)',
-                  borderRadius: '1.25rem',
-                  textDecoration: 'none',
-                  transition: 'all 0.35s cubic-bezier(0.34,1.56,0.64,1)',
-                  position: 'relative', overflow: 'hidden',
-                }}
-                className="cat-link"
-                data-color={colors.glow}
-              >
-                {/* Icon */}
-                <div style={{
-                  width: '3.5rem', height: '3.5rem', flexShrink: 0,
-                  background: colors.bg,
-                  border: `1px solid ${colors.border}`,
-                  borderRadius: '1rem',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  transition: 'all 0.3s ease',
-                }}>
-                  <Icon size={22} color={colors.text} />
-                </div>
+        {isLoading ? (
+          <div style={{ textAlign: 'center', padding: '4rem 1rem', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem', color: 'var(--text-primary)' }}>
+            <div style={{ width: '5rem', height: '5rem', background: '#ffffff', border: '1px solid var(--border-subtle)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <LoaderCircle size={30} color="var(--red-primary)" className="category-loading-icon" />
+            </div>
+            <h3 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--text-primary)', margin: 0 }}>Loading categories...</h3>
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem', margin: 0 }}>Fetching category collections from Supabase.</p>
+          </div>
+        ) : categories.length === 0 ? (
+          <div style={{ textAlign: 'center', padding: '4rem 1rem', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem', color: 'var(--text-primary)' }}>
+            <div style={{ width: '5rem', height: '5rem', background: '#ffffff', border: '1px solid var(--border-subtle)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <Laptop size={30} color="var(--text-muted)" />
+            </div>
+            <h3 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--text-primary)', margin: 0 }}>No categories found</h3>
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem', margin: 0 }}>No product categories are available right now.</p>
+          </div>
+        ) : (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: '1.25rem' }}>
+            {categories.map((catName) => {
+              const Icon = categoryIcons[catName] || Laptop;
+              const colors = categoryColors[catName] || { bg: 'rgba(239,68,68,0.1)', border: 'rgba(239,68,68,0.2)', text: '#ef4444', glow: 'rgba(239,68,68,0.1)' };
+              const count = products.filter((p) => p.category === catName).length;
 
-                {/* Text */}
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <h3 style={{ fontSize: '0.95rem', fontWeight: 700, color: 'var(--text-primary)', margin: '0 0 0.25rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                    {catName}
-                  </h3>
-                  <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', margin: 0 }}>
-                    {count > 0 ? `${count} product${count > 1 ? 's' : ''}` : 'View collection'}
-                  </p>
-                </div>
+              return (
+                <Link
+                  key={catName}
+                  to={`/products?category=${encodeURIComponent(catName)}`}
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: '1.25rem',
+                    padding: '1.5rem',
+                    background: 'var(--bg-card)',
+                    border: '1px solid var(--border-subtle)',
+                    borderRadius: '1.25rem',
+                    textDecoration: 'none',
+                    transition: 'all 0.35s cubic-bezier(0.34,1.56,0.64,1)',
+                    position: 'relative', overflow: 'hidden',
+                  }}
+                  className="cat-link"
+                  data-color={colors.glow}
+                >
+                  {/* Icon */}
+                  <div style={{
+                    width: '3.5rem', height: '3.5rem', flexShrink: 0,
+                    background: colors.bg,
+                    border: `1px solid ${colors.border}`,
+                    borderRadius: '1rem',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    transition: 'all 0.3s ease',
+                  }}>
+                    <Icon size={22} color={colors.text} />
+                  </div>
 
-                {/* Arrow */}
-                <ArrowRight size={16} color="var(--text-muted)" style={{ flexShrink: 0, transition: 'all 0.3s ease' }} className="cat-arrow" />
+                  {/* Text */}
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <h3 style={{ fontSize: '0.95rem', fontWeight: 700, color: 'var(--text-primary)', margin: '0 0 0.25rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      {catName}
+                    </h3>
+                    <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', margin: 0 }}>
+                      {count > 0 ? `${count} product${count > 1 ? 's' : ''}` : 'View collection'}
+                    </p>
+                  </div>
 
-                {/* Bottom accent line */}
-                <div style={{
-                  position: 'absolute', bottom: 0, left: 0, right: 0, height: '2px',
-                  background: `linear-gradient(90deg, ${colors.text}, transparent)`,
-                  transform: 'scaleX(0)', transformOrigin: 'left',
-                  transition: 'transform 0.4s ease',
-                }} className="cat-line" />
-              </Link>
-            );
-          })}
-        </div>
+                  {/* Arrow */}
+                  <ArrowRight size={16} color="var(--text-muted)" style={{ flexShrink: 0, transition: 'all 0.3s ease' }} className="cat-arrow" />
+
+                  {/* Bottom accent line */}
+                  <div style={{
+                    position: 'absolute', bottom: 0, left: 0, right: 0, height: '2px',
+                    background: `linear-gradient(90deg, ${colors.text}, transparent)`,
+                    transform: 'scaleX(0)', transformOrigin: 'left',
+                    transition: 'transform 0.4s ease',
+                  }} className="cat-line" />
+                </Link>
+              );
+            })}
+          </div>
+        )}
 
         {/* All Products CTA */}
         <div style={{ textAlign: 'center', marginTop: '3rem' }}>
@@ -158,6 +204,8 @@ export function Categories() {
         }
         .cat-link:hover .cat-line { transform: scaleX(1) !important; }
         .cat-link:hover .cat-arrow { color: var(--text-primary) !important; transform: translateX(4px); }
+        .category-loading-icon { animation: category-spin 0.9s linear infinite; }
+        @keyframes category-spin { to { transform: rotate(360deg); } }
       `}</style>
     </div>
   );
