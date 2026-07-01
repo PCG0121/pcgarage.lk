@@ -70,12 +70,14 @@ function getCategoryName(row: ProductRow) {
 
 function mapProduct(row: ProductRow): Product {
   const stockQuantity = row.stock_quantity ?? 0;
+  const price = Number(row.price);
+
   return {
     id: row.id,
     slug: row.slug,
-    name: row.name,
+    name: row.name || 'Unnamed product',
     description: row.description || 'Product details will be updated soon.',
-    price: Number(row.price),
+    price: Number.isFinite(price) ? price : 0,
     category: getCategoryName(row),
     category_id: row.category_id,
     image_url: row.image_url || '',
@@ -125,32 +127,42 @@ export const useProductStore = create<ProductState>()((set, get) => ({
 
     set({ isLoading: true, error: null, isUsingFallback: false });
 
-    const [{ data: categoryData, error: categoryError }, { data: productData, error: productError }] = await Promise.all([
-      supabase.from('categories').select('id,name,slug,created_at').order('name'),
-      supabase
-        .from('products')
-        .select('id,name,slug,description,price,category_id,image_url,sku,warranty,stock_quantity,is_active,created_at,updated_at,categories(name)')
-        .eq('is_active', true)
-        .order('created_at', { ascending: false }),
-    ]);
+    try {
+      const [{ data: categoryData, error: categoryError }, { data: productData, error: productError }] = await Promise.all([
+        supabase.from('categories').select('id,name,slug,created_at').order('name'),
+        supabase
+          .from('products')
+          .select('id,name,slug,description,price,category_id,image_url,sku,warranty,stock_quantity,is_active,created_at,updated_at,categories(name)')
+          .eq('is_active', true)
+          .order('created_at', { ascending: false }),
+      ]);
 
-    if (categoryError || productError) {
+      if (categoryError || productError) {
+        set({
+          products: [],
+          categories: [],
+          isUsingFallback: false,
+          isLoading: false,
+          error: categoryError?.message || productError?.message || 'Could not load products.',
+        });
+        return;
+      }
+
+      set({
+        categories: (categoryData as CategoryRecord[] | null) || [],
+        products: ((productData as ProductRow[] | null) || []).map(mapProduct),
+        isLoading: false,
+        error: null,
+      });
+    } catch (error) {
       set({
         products: [],
         categories: [],
         isUsingFallback: false,
         isLoading: false,
-        error: categoryError?.message || productError?.message || 'Could not load products.',
+        error: error instanceof Error ? error.message : 'Could not load products.',
       });
-      return;
     }
-
-    set({
-      categories: (categoryData as CategoryRecord[] | null) || fallbackCategoryRecords,
-      products: ((productData as ProductRow[] | null) || []).map(mapProduct),
-      isLoading: false,
-      error: null,
-    });
   },
 
   loadAdminProducts: async () => {
@@ -167,31 +179,41 @@ export const useProductStore = create<ProductState>()((set, get) => ({
 
     set({ isLoading: true, error: null, isUsingFallback: false });
 
-    const [{ data: categoryData, error: categoryError }, { data: productData, error: productError }] = await Promise.all([
-      supabase.from('categories').select('id,name,slug,created_at').order('name'),
-      supabase
-        .from('products')
-        .select('id,name,slug,description,price,category_id,image_url,sku,warranty,stock_quantity,is_active,created_at,updated_at,categories(name)')
-        .order('created_at', { ascending: false }),
-    ]);
+    try {
+      const [{ data: categoryData, error: categoryError }, { data: productData, error: productError }] = await Promise.all([
+        supabase.from('categories').select('id,name,slug,created_at').order('name'),
+        supabase
+          .from('products')
+          .select('id,name,slug,description,price,category_id,image_url,sku,warranty,stock_quantity,is_active,created_at,updated_at,categories(name)')
+          .order('created_at', { ascending: false }),
+      ]);
 
-    if (categoryError || productError) {
+      if (categoryError || productError) {
+        set({
+          products: [],
+          categories: [],
+          isUsingFallback: false,
+          isLoading: false,
+          error: categoryError?.message || productError?.message || 'Could not load admin products.',
+        });
+        return;
+      }
+
+      set({
+        categories: (categoryData as CategoryRecord[] | null) || [],
+        products: ((productData as ProductRow[] | null) || []).map(mapProduct),
+        isLoading: false,
+        error: null,
+      });
+    } catch (error) {
       set({
         products: [],
         categories: [],
         isUsingFallback: false,
         isLoading: false,
-        error: categoryError?.message || productError?.message || 'Could not load admin products.',
+        error: error instanceof Error ? error.message : 'Could not load admin products.',
       });
-      return;
     }
-
-    set({
-      categories: (categoryData as CategoryRecord[] | null) || fallbackCategoryRecords,
-      products: ((productData as ProductRow[] | null) || []).map(mapProduct),
-      isLoading: false,
-      error: null,
-    });
   },
 
   addProduct: async (product) => {

@@ -2,7 +2,7 @@ import { useEffect, useState, useMemo } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useCartStore } from '../store/cartStore';
 import { useProductStore } from '../store/productStore';
-import { Plus, Search, SlidersHorizontal, X, ShoppingCart } from 'lucide-react';
+import { AlertCircle, LoaderCircle, Plus, Search, SlidersHorizontal, X, ShoppingCart } from 'lucide-react';
 import type { Product } from '../types';
 
 // Toast
@@ -27,6 +27,8 @@ export function ProductList() {
   const addItem = useCartStore((state) => state.addItem);
   const products = useProductStore((state) => state.products);
   const categories = useProductStore((state) => state.categories.map((category) => category.name));
+  const isLoading = useProductStore((state) => state.isLoading);
+  const error = useProductStore((state) => state.error);
   const loadProducts = useProductStore((state) => state.loadProducts);
   const [searchParams] = useSearchParams();
   const [search, setSearch] = useState('');
@@ -53,6 +55,8 @@ export function ProductList() {
     else if (sortBy === 'name') result.sort((a, b) => a.name.localeCompare(b.name));
     return result;
   }, [products, search, selectedCategory, sortBy]);
+
+  const hasFilters = selectedCategory !== 'All' || Boolean(search.trim());
 
   return (
     <div style={{ flex: 1, background: 'var(--bg-base)', minHeight: '60vh' }}>
@@ -128,6 +132,32 @@ export function ProductList() {
       </div>
 
       <div style={{ maxWidth: '80rem', margin: '0 auto', padding: '1.5rem 1.5rem 3rem' }}>
+        {error && (
+          <div
+            role="alert"
+            style={{
+              display: 'flex',
+              alignItems: 'flex-start',
+              gap: '0.75rem',
+              background: '#fff7ed',
+              border: '1px solid #fed7aa',
+              color: '#9a3412',
+              borderRadius: '0.875rem',
+              padding: '0.875rem 1rem',
+              marginBottom: '1rem',
+              fontSize: '0.85rem',
+              fontWeight: 650,
+              lineHeight: 1.5,
+            }}
+          >
+            <AlertCircle size={18} style={{ flexShrink: 0, marginTop: '0.1rem' }} />
+            <div>
+              <div style={{ color: '#7c2d12', fontWeight: 800, marginBottom: '0.1rem' }}>Products could not be loaded</div>
+              <div>Please refresh the page or check the Supabase deployment environment variables.</div>
+            </div>
+          </div>
+        )}
+
         {/* Category Filter Pills */}
         <div style={{ display: 'flex', gap: '0.5rem', overflowX: 'auto', paddingBottom: '0.25rem', marginBottom: '2rem', scrollbarWidth: 'none' }}>
           <button
@@ -150,20 +180,32 @@ export function ProductList() {
         </div>
 
         {/* Products Grid */}
-        {filteredProducts.length === 0 ? (
+        {isLoading ? (
+          <div style={{ textAlign: 'center', padding: '5rem 1rem', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem', color: 'var(--text-primary)' }}>
+            <div style={{ width: '5rem', height: '5rem', background: '#ffffff', border: '1px solid var(--border-subtle)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <LoaderCircle size={30} color="var(--red-primary)" className="product-loading-icon" />
+            </div>
+            <h3 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--text-primary)', margin: 0 }}>Loading products...</h3>
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem', margin: 0 }}>Fetching active products from Supabase.</p>
+          </div>
+        ) : filteredProducts.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '5rem 1rem', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem' }}>
             <div style={{ width: '5rem', height: '5rem', background: '#ffffff', border: '1px solid var(--border-subtle)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <ShoppingCart size={30} color="var(--text-muted)" />
             </div>
             <h3 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--text-primary)', margin: 0 }}>No products found</h3>
-            <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem', margin: 0 }}>Try a different search or category filter.</p>
-            <button
-              onClick={() => { setSearch(''); setSelectedCategory('All'); }}
-              className="btn-outline-glow"
-              style={{ marginTop: '0.5rem' }}
-            >
-              Clear Filters
-            </button>
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem', margin: 0 }}>
+              {hasFilters ? 'Try a different search or category filter.' : 'No active products are available right now.'}
+            </p>
+            {hasFilters && (
+              <button
+                onClick={() => { setSearch(''); setSelectedCategory('All'); }}
+                className="btn-outline-glow"
+                style={{ marginTop: '0.5rem' }}
+              >
+                Clear Filters
+              </button>
+            )}
           </div>
         ) : (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '1.25rem' }}>
@@ -227,6 +269,8 @@ export function ProductList() {
 
       <style>{`
         .product-card:hover .product-img { opacity: 1 !important; transform: scale(1.04); }
+        .product-loading-icon { animation: product-spin 0.9s linear infinite; }
+        @keyframes product-spin { to { transform: rotate(360deg); } }
         @media (max-width: 640px) {
           #product-search { width: 100% !important; }
         }
