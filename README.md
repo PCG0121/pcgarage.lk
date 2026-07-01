@@ -179,17 +179,9 @@ Build command: npm run build
 Output folder: dist
 ```
 
-The SPA redirect file is included at:
+Do not add a `public/_redirects` SPA fallback for this deployment. Cloudflare rejected `/* /index.html 200` as an infinite loop for this project.
 
-```text
-public/_redirects
-```
-
-with:
-
-```text
-/* /index.html 200
-```
+This repo does not use `wrangler.jsonc` or Cloudflare Workers static assets. If you later move it to Workers static assets, keep `assets.directory` set to `./dist` and configure `assets.not_found_handling = "single-page-application"` there instead of using `_redirects`.
 
 In Cloudflare Pages, add these environment variables under your project settings:
 
