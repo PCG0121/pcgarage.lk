@@ -26,7 +26,7 @@ function Toast({ message, onClose }: { message: string; onClose: () => void }) {
 export function ProductList() {
   const addItem = useCartStore((state) => state.addItem);
   const products = useProductStore((state) => state.products);
-  const categories = useProductStore((state) => state.categories.map((category) => category.name));
+  const categoryRecords = useProductStore((state) => state.categories);
   const isLoading = useProductStore((state) => state.isLoading);
   const error = useProductStore((state) => state.error);
   const loadProducts = useProductStore((state) => state.loadProducts);
@@ -35,6 +35,7 @@ export function ProductList() {
   const [selectedCategory, setSelectedCategory] = useState<string>(searchParams.get('category') || 'All');
   const [sortBy, setSortBy] = useState<'default' | 'price-asc' | 'price-desc' | 'name'>('default');
   const [toast, setToast] = useState<string | null>(null);
+  const categories = useMemo(() => categoryRecords.map((category) => category.name), [categoryRecords]);
 
   useEffect(() => {
     loadProducts();

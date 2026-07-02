@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useProductStore } from '../store/productStore';
 import {
   Laptop, Monitor, Keyboard, Battery, Zap, HardDrive, Cpu, Printer, ArrowRight, AlertCircle, LoaderCircle
@@ -29,10 +29,11 @@ const categoryColors: Record<string, { bg: string; border: string; text: string;
 
 export function Categories() {
   const products = useProductStore((state) => state.products);
-  const categories = useProductStore((state) => state.categories.map((category) => category.name));
+  const categoryRecords = useProductStore((state) => state.categories);
   const isLoading = useProductStore((state) => state.isLoading);
   const error = useProductStore((state) => state.error);
   const loadProducts = useProductStore((state) => state.loadProducts);
+  const categories = useMemo(() => categoryRecords.map((category) => category.name), [categoryRecords]);
 
   useEffect(() => {
     loadProducts();

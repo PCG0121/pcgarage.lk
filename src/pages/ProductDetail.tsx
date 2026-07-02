@@ -27,6 +27,8 @@ export function ProductDetail() {
   const navigate = useNavigate();
   const products = useProductStore((state) => state.products);
   const isLoading = useProductStore((state) => state.isLoading);
+  const hasLoaded = useProductStore((state) => state.hasLoaded);
+  const error = useProductStore((state) => state.error);
   const loadProducts = useProductStore((state) => state.loadProducts);
   const product = products.find((p) => p.id === id || p.slug === id);
   const addItem = useCartStore((state) => state.addItem);
@@ -37,7 +39,7 @@ export function ProductDetail() {
     loadProducts();
   }, [loadProducts]);
 
-  if (isLoading && !product) {
+  if ((isLoading || !hasLoaded) && !product) {
     return (
       <div style={{ flex: 1, background: 'var(--bg-base)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '60vh', gap: '1rem' }}>
         <Package size={48} color="var(--text-muted)" />
@@ -50,7 +52,14 @@ export function ProductDetail() {
     return (
       <div style={{ flex: 1, background: 'var(--bg-base)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '60vh', gap: '1rem' }}>
         <Package size={48} color="var(--text-muted)" />
-        <h2 style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--text-primary)' }}>Product not found</h2>
+        <h2 style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--text-primary)' }}>
+          {error ? 'Product could not be loaded' : 'Product not found'}
+        </h2>
+        {error && (
+          <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', margin: 0, maxWidth: '28rem', textAlign: 'center', lineHeight: 1.6 }}>
+            Please refresh the page or check the product catalog connection.
+          </p>
+        )}
         <button onClick={() => navigate('/products')} className="btn-outline-glow">
           ← Back to products
         </button>

@@ -38,6 +38,7 @@ interface ProductState {
   products: Product[];
   categories: CategoryRecord[];
   isLoading: boolean;
+  hasLoaded: boolean;
   error: string | null;
   isUsingFallback: boolean;
   loadProducts: () => Promise<void>;
@@ -110,6 +111,7 @@ export const useProductStore = create<ProductState>()((set, get) => ({
   products: hasSupabaseConfig ? [] : mockProducts,
   categories: hasSupabaseConfig ? [] : fallbackCategoryRecords,
   isLoading: false,
+  hasLoaded: !hasSupabaseConfig,
   error: null,
   isUsingFallback: !hasSupabaseConfig,
 
@@ -120,6 +122,7 @@ export const useProductStore = create<ProductState>()((set, get) => ({
         categories: fallbackCategoryRecords,
         isUsingFallback: true,
         isLoading: false,
+        hasLoaded: true,
         error: null,
       });
       return;
@@ -143,6 +146,7 @@ export const useProductStore = create<ProductState>()((set, get) => ({
           categories: [],
           isUsingFallback: false,
           isLoading: false,
+          hasLoaded: true,
           error: categoryError?.message || productError?.message || 'Could not load products.',
         });
         return;
@@ -152,6 +156,7 @@ export const useProductStore = create<ProductState>()((set, get) => ({
         categories: (categoryData as CategoryRecord[] | null) || [],
         products: ((productData as ProductRow[] | null) || []).map(mapProduct),
         isLoading: false,
+        hasLoaded: true,
         error: null,
       });
     } catch (error) {
@@ -160,6 +165,7 @@ export const useProductStore = create<ProductState>()((set, get) => ({
         categories: [],
         isUsingFallback: false,
         isLoading: false,
+        hasLoaded: true,
         error: error instanceof Error ? error.message : 'Could not load products.',
       });
     }
@@ -172,6 +178,7 @@ export const useProductStore = create<ProductState>()((set, get) => ({
         categories: fallbackCategoryRecords,
         isUsingFallback: true,
         isLoading: false,
+        hasLoaded: true,
         error: null,
       });
       return;
@@ -194,6 +201,7 @@ export const useProductStore = create<ProductState>()((set, get) => ({
           categories: [],
           isUsingFallback: false,
           isLoading: false,
+          hasLoaded: true,
           error: categoryError?.message || productError?.message || 'Could not load admin products.',
         });
         return;
@@ -203,6 +211,7 @@ export const useProductStore = create<ProductState>()((set, get) => ({
         categories: (categoryData as CategoryRecord[] | null) || [],
         products: ((productData as ProductRow[] | null) || []).map(mapProduct),
         isLoading: false,
+        hasLoaded: true,
         error: null,
       });
     } catch (error) {
@@ -211,6 +220,7 @@ export const useProductStore = create<ProductState>()((set, get) => ({
         categories: [],
         isUsingFallback: false,
         isLoading: false,
+        hasLoaded: true,
         error: error instanceof Error ? error.message : 'Could not load admin products.',
       });
     }
@@ -286,6 +296,7 @@ export const useProductStore = create<ProductState>()((set, get) => ({
       products: mockProducts,
       categories: fallbackCategoryRecords,
       isUsingFallback: true,
+      hasLoaded: true,
       error: null,
     });
   },

@@ -14,6 +14,21 @@ function slugify(value: string) {
     .replace(/^-+|-+$/g, '');
 }
 
+function getProductSaveError(error: unknown) {
+  const message = error instanceof Error ? error.message : 'Could not save product.';
+  const normalized = message.toLowerCase();
+
+  if (normalized.includes('row-level security')) {
+    return 'Product save blocked by Supabase admin permissions. Check that this logged-in user is in public.admin_users.';
+  }
+
+  if (normalized.includes('duplicate key') || normalized.includes('products_slug_key')) {
+    return 'A product with this slug already exists. Change the slug or product name and try again.';
+  }
+
+  return message;
+}
+
 export function AdminProducts() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
@@ -54,10 +69,11 @@ export function AdminProducts() {
 
   const handleSaveProduct = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    const form = event.currentTarget;
     setFormError('');
     setIsSaving(true);
 
-    const formData = new FormData(event.currentTarget);
+    const formData = new FormData(form);
     const name = String(formData.get('name') || '').trim();
     const categoryId = String(formData.get('category_id') || '').trim();
     const categoryName = categories.find((category) => category.id === categoryId)?.name || editingProduct?.category || 'Accessories';
@@ -86,10 +102,10 @@ export function AdminProducts() {
         await addProduct(payload);
       }
 
-      event.currentTarget.reset();
+      form.reset();
       closeModal();
     } catch (error) {
-      setFormError(error instanceof Error ? error.message : 'Could not save product.');
+      setFormError(getProductSaveError(error));
     } finally {
       setIsSaving(false);
     }
@@ -264,7 +280,8 @@ export function AdminProducts() {
 
                     <div>
                       <label className="block text-sm font-bold text-zinc-900 mb-1">Category</label>
-                      <select name="category_id" defaultValue={selectedCategoryId} required className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:border-rose-500 focus:outline-none focus:ring-1 focus:ring-rose-500">
+                      <select name="category_id" defaultValue={selectedCategoryId} className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:border-rose-500 focus:outline-none focus:ring-1 focus:ring-rose-500">
+                        {categories.length === 0 && <option value="">Accessories</option>}
                         {categories.map((category) => (
                           <option key={category.id} value={category.id}>{category.name}</option>
                         ))}
