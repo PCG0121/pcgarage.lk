@@ -80,9 +80,9 @@ export function ProductList() {
             </h1>
 
             {/* Search & Sort */}
-            <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap' }}>
+            <div className="product-toolbar" style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap' }}>
               {/* Search */}
-              <div style={{ position: 'relative' }}>
+              <div className="product-search-wrap" style={{ position: 'relative' }}>
                 <Search size={14} color="var(--text-muted)" style={{ position: 'absolute', left: '0.75rem', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }} />
                 <input
                   id="product-search"
@@ -101,7 +101,7 @@ export function ProductList() {
               </div>
 
               {/* Sort */}
-              <div style={{ position: 'relative' }}>
+              <div className="product-sort-wrap" style={{ position: 'relative' }}>
                 <SlidersHorizontal size={13} color="var(--text-muted)" style={{ position: 'absolute', left: '0.75rem', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }} />
                 <select
                   id="product-sort"
@@ -160,7 +160,7 @@ export function ProductList() {
         )}
 
         {/* Category Filter Pills */}
-        <div style={{ display: 'flex', gap: '0.5rem', overflowX: 'auto', paddingBottom: '0.25rem', marginBottom: '2rem', scrollbarWidth: 'none' }}>
+        <div className="product-filter-row" style={{ display: 'flex', gap: '0.5rem', overflowX: 'auto', paddingBottom: '0.25rem', marginBottom: '2rem', scrollbarWidth: 'none' }}>
           <button
             id="filter-all"
             onClick={() => setSelectedCategory('All')}
@@ -216,13 +216,18 @@ export function ProductList() {
                 className="product-card animate-fade-in-up"
                 style={{ animationDelay: `${Math.min(i * 0.06, 0.5)}s`, animationFillMode: 'both' }}
               >
-                <Link to={`/product/${product.slug || product.id}`} style={{ display: 'block', position: 'relative', overflow: 'hidden', aspectRatio: '4/3', background: '#f1f5f9' }}>
-                  <img
-                    src={product.image_url}
-                    alt={product.name}
-                    style={{ width: '100%', height: '100%', objectFit: 'cover', mixBlendMode: 'luminosity', opacity: 0.85, transition: 'all 0.5s ease' }}
-                    className="product-img"
-                  />
+                <Link className="product-image-link" to={`/product/${product.slug || product.id}`} style={{ display: 'block', position: 'relative', overflow: 'hidden', aspectRatio: '4/3', background: '#f1f5f9' }}>
+                  {product.image_url && (
+                    <img
+                      src={product.image_url}
+                      alt={product.name}
+                      onError={(event) => {
+                        event.currentTarget.style.display = 'none';
+                      }}
+                      style={{ width: '100%', height: '100%', objectFit: 'cover', mixBlendMode: 'luminosity', opacity: 0.85, transition: 'all 0.5s ease' }}
+                      className="product-img"
+                    />
+                  )}
                   <div style={{ position: 'absolute', top: '0.625rem', left: '0.625rem' }}>
                     {product.in_stock
                       ? <span className="badge-green">In Stock</span>
@@ -273,7 +278,24 @@ export function ProductList() {
         .product-loading-icon { animation: product-spin 0.9s linear infinite; }
         @keyframes product-spin { to { transform: rotate(360deg); } }
         @media (max-width: 640px) {
+          .product-toolbar,
+          .product-search-wrap,
+          .product-sort-wrap {
+            width: 100% !important;
+          }
           #product-search { width: 100% !important; }
+          #product-sort { width: 100% !important; }
+          .product-toolbar select {
+            width: 100% !important;
+          }
+          .product-image-link {
+            aspect-ratio: 16 / 10 !important;
+          }
+          .product-filter-row {
+            flex-wrap: wrap !important;
+            overflow-x: visible !important;
+            gap: 0.55rem !important;
+          }
         }
         select option { background: #ffffff; color: #0f172a; }
       `}</style>

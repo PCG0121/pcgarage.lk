@@ -47,12 +47,17 @@ function ProductCard({ product, onAdd }: { key?: string; product: Product; onAdd
   return (
     <div className="product-card">
       <Link to={`/product/${product.slug || product.id}`} style={{ display: 'block', position: 'relative', aspectRatio: '4/3', background: '#f1f5f9', overflow: 'hidden' }}>
-        <img
-          src={product.image_url}
-          alt={product.name}
-          className="product-img"
-          style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.92, transition: 'transform 0.22s ease, opacity 0.22s ease' }}
-        />
+        {product.image_url && (
+          <img
+            src={product.image_url}
+            alt={product.name}
+            className="product-img"
+            onError={(event) => {
+              event.currentTarget.style.display = 'none';
+            }}
+            style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.92, transition: 'transform 0.22s ease, opacity 0.22s ease' }}
+          />
+        )}
         <div style={{ position: 'absolute', top: '0.75rem', left: '0.75rem' }}>
           <span className={product.in_stock ? 'badge-green' : 'badge-red'}>
             {product.in_stock ? 'In stock' : 'Sold out'}
@@ -139,7 +144,7 @@ export function Home() {
                 PC Garage helps you buy trusted components and fix laptops quickly with clear pricing, WhatsApp ordering, and island-wide delivery.
               </p>
 
-              <div style={{ display: 'flex', gap: '0.85rem', flexWrap: 'wrap', marginBottom: '2rem' }}>
+              <div className="hero-actions" style={{ display: 'flex', gap: '0.85rem', flexWrap: 'wrap', marginBottom: '2rem' }}>
                 <Link to="/products" className="btn-glow" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', textDecoration: 'none' }}>
                   Shop products <ArrowRight size={16} />
                 </Link>
@@ -165,7 +170,16 @@ export function Home() {
 
             <div style={{ border: '1px solid var(--border-subtle)', borderRadius: '1.2rem', overflow: 'hidden', background: '#ffffff', boxShadow: 'var(--shadow-soft)' }}>
               <Link to={`/product/${heroProduct.slug || heroProduct.id}`} style={{ display: 'block', height: '22rem', background: '#f1f5f9', overflow: 'hidden' }}>
-                <img src={heroProduct.image_url} alt={heroProduct.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                {heroProduct.image_url && (
+                  <img
+                    src={heroProduct.image_url}
+                    alt={heroProduct.name}
+                    onError={(event) => {
+                      event.currentTarget.style.display = 'none';
+                    }}
+                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                  />
+                )}
               </Link>
               <div style={{ padding: '1.25rem' }}>
                 <span className="badge-red">Featured deal</span>
@@ -286,7 +300,18 @@ export function Home() {
           .stats-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
         }
         @media (max-width: 640px) {
-          .hero-grid h1 { font-size: 2.25rem !important; }
+          .hero-bg { padding: 2.2rem 1rem 1.75rem !important; }
+          .hero-grid h1 { font-size: 2.05rem !important; line-height: 1.08 !important; }
+          .hero-grid p { font-size: 0.94rem !important; }
+          .hero-grid > div:first-child { min-height: 0 !important; }
+          .hero-actions {
+            display: grid !important;
+            grid-template-columns: 1fr !important;
+          }
+          .hero-actions a {
+            justify-content: center !important;
+          }
+          .hero-grid > div:last-child a:first-child { height: 15rem !important; }
           .trust-grid, .repair-grid, .products-grid, .stats-grid { grid-template-columns: 1fr !important; }
           .category-strip { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
         }

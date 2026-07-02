@@ -113,16 +113,21 @@ export function ProductDetail() {
                 : <span style={{ background: 'rgba(30,30,40,0.95)', color: 'var(--text-muted)', fontSize: '0.65rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', padding: '0.25rem 0.625rem', borderRadius: '9999px' }}>Out of Stock</span>
               }
             </div>
-            <img
-              src={product.image_url}
-              alt={product.name}
-              style={{
-                width: '80%', height: '80%', objectFit: 'contain',
-                mixBlendMode: 'luminosity', opacity: 0.9,
-                transition: 'all 0.5s ease',
-              }}
-              className="detail-img"
-            />
+            {product.image_url && (
+              <img
+                src={product.image_url}
+                alt={product.name}
+                onError={(event) => {
+                  event.currentTarget.style.display = 'none';
+                }}
+                style={{
+                  width: '80%', height: '80%', objectFit: 'contain',
+                  mixBlendMode: 'luminosity', opacity: 0.9,
+                  transition: 'all 0.5s ease',
+                }}
+                className="detail-img"
+              />
+            )}
           </div>
 
           {/* Info Panel */}
@@ -182,7 +187,7 @@ export function ProductDetail() {
             </div>
 
             {/* Quantity + Add to Cart */}
-            <div style={{ display: 'flex', gap: '0.875rem', alignItems: 'center', marginBottom: '1rem' }}>
+            <div className="product-purchase-row" style={{ display: 'flex', gap: '0.875rem', alignItems: 'center', marginBottom: '1rem' }}>
               {/* Qty */}
               <div style={{
                 display: 'flex', alignItems: 'center', gap: '0.5rem',
@@ -242,7 +247,17 @@ export function ProductDetail() {
               {relatedProducts.map((rp) => (
                 <div key={rp.id} className="product-card">
                   <Link to={`/product/${rp.slug || rp.id}`} style={{ display: 'block', aspectRatio: '4/3', overflow: 'hidden', background: '#f1f5f9' }}>
-                    <img src={rp.image_url} alt={rp.name} style={{ width: '100%', height: '100%', objectFit: 'cover', mixBlendMode: 'luminosity', opacity: 0.8 }} className="product-img" />
+                    {rp.image_url && (
+                      <img
+                        src={rp.image_url}
+                        alt={rp.name}
+                        onError={(event) => {
+                          event.currentTarget.style.display = 'none';
+                        }}
+                        style={{ width: '100%', height: '100%', objectFit: 'cover', mixBlendMode: 'luminosity', opacity: 0.8 }}
+                        className="product-img"
+                      />
+                    )}
                   </Link>
                   <div style={{ padding: '0.875rem' }}>
                     <Link to={`/product/${rp.slug || rp.id}`} style={{ textDecoration: 'none' }}>
@@ -263,7 +278,13 @@ export function ProductDetail() {
       </div>
 
       <style>{`
-        @media (max-width: 768px) { .detail-grid { grid-template-columns: 1fr !important; } }
+        @media (max-width: 768px) {
+          .detail-grid { grid-template-columns: 1fr !important; gap: 1.6rem !important; }
+          .detail-grid > div:first-child { border-radius: 1rem !important; }
+          .product-purchase-row { flex-direction: column !important; align-items: stretch !important; }
+          .product-purchase-row > div,
+          .product-purchase-row > button { width: 100% !important; }
+        }
         .detail-img:hover { opacity: 1 !important; transform: scale(1.04); }
         .back-btn:hover { color: var(--text-primary) !important; }
         .product-card:hover .product-img { opacity: 1 !important; transform: scale(1.06); }

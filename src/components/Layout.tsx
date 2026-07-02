@@ -1,5 +1,5 @@
 import { Link, Outlet, useLocation } from 'react-router-dom';
-import { Menu, Search, ShoppingCart, Wrench, X, Cpu, ChevronRight, MapPin, Phone } from 'lucide-react';
+import { Menu, Search, ShoppingCart, Wrench, X, Cpu, ChevronRight, MapPin, Phone, Home as HomeIcon, Package, Grid3X3 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useCartStore } from '../store/cartStore';
 
@@ -34,8 +34,19 @@ export function Layout() {
     { to: '/products', label: 'Products' },
   ];
 
+  const bottomNavLinks = [
+    { to: '/', label: 'Home', icon: HomeIcon },
+    { to: '/products', label: 'Products', icon: Package },
+    { to: '/categories', label: 'Categories', icon: Grid3X3 },
+    { to: '/cart', label: 'Cart', icon: ShoppingCart },
+  ];
+
   const isActive = (path: string) =>
-    path === '/' ? location.pathname === '/' : location.pathname.startsWith(path);
+    path === '/'
+      ? location.pathname === '/'
+      : path === '/products'
+        ? location.pathname.startsWith('/products') || location.pathname.startsWith('/product')
+        : location.pathname.startsWith(path);
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', background: 'var(--bg-base)' }}>
@@ -47,7 +58,7 @@ export function Layout() {
         color: 'var(--text-secondary)',
         fontSize: '0.78rem',
       }}>
-        <div style={{
+        <div className="topbar-inner" style={{
           maxWidth: '80rem',
           margin: '0 auto',
           padding: '0.55rem 1.5rem',
@@ -57,11 +68,11 @@ export function Layout() {
           gap: '1rem',
           flexWrap: 'wrap',
         }}>
-          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.45rem', fontWeight: 700 }}>
+          <span className="topbar-service" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.45rem', fontWeight: 700 }}>
             <Wrench size={14} color="var(--red-bright)" />
             Same-day diagnostics and trusted PC repairs
           </span>
-          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.9rem', color: 'var(--text-muted)' }}>
+          <span className="topbar-contact" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.9rem', color: 'var(--text-muted)' }}>
             <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}>
               <MapPin size={13} /> Kurunegala
             </span>
@@ -82,7 +93,7 @@ export function Layout() {
         borderBottom: '1px solid var(--border-subtle)',
       }}>
         <div style={{ maxWidth: '80rem', margin: '0 auto', padding: '0 1.5rem' }}>
-          <div style={{ height: '4.35rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem' }}>
+          <div className="site-header-row" style={{ height: '4.35rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem' }}>
             <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', textDecoration: 'none', minWidth: 0 }}>
               <div style={{
                 width: '2.55rem',
@@ -97,7 +108,7 @@ export function Layout() {
               }}>
                 <Cpu size={19} color="white" />
               </div>
-              <div style={{ lineHeight: 1.08, minWidth: 0 }}>
+              <div className="brand-copy" style={{ lineHeight: 1.08, minWidth: 0 }}>
                 <div style={{ fontSize: '1.05rem', fontWeight: 900, color: 'var(--text-primary)', letterSpacing: 0 }}>
                   PC Garage
                 </div>
@@ -115,7 +126,7 @@ export function Layout() {
               ))}
             </nav>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.55rem' }}>
+            <div className="header-actions" style={{ display: 'flex', alignItems: 'center', gap: '0.55rem' }}>
               {searchOpen && (
                 <input
                   autoFocus
@@ -238,11 +249,27 @@ export function Layout() {
         )}
       </header>
 
-      <main style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+      <main className="site-main" style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
         <Outlet />
       </main>
 
-      <footer style={{
+      <nav className="mobile-bottom-nav" aria-label="Mobile primary navigation">
+        {bottomNavLinks.map(({ to, label, icon: Icon }) => {
+          const active = isActive(to);
+
+          return (
+            <Link key={to} to={to} className={`bottom-nav-link ${active ? 'active' : ''}`} aria-label={label}>
+              <span className="bottom-nav-icon">
+                <Icon size={20} />
+                {to === '/cart' && cartCount > 0 && <span className="bottom-cart-badge">{cartCount}</span>}
+              </span>
+              <span>{label}</span>
+            </Link>
+          );
+        })}
+      </nav>
+
+      <footer className="site-footer" style={{
         background: '#ffffff',
         borderTop: '1px solid var(--border-subtle)',
         marginTop: 'auto',
@@ -325,10 +352,142 @@ export function Layout() {
       </footer>
 
       <style>{`
+        .mobile-bottom-nav {
+          display: none;
+          position: fixed;
+          left: 50%;
+          right: auto;
+          bottom: max(0.85rem, env(safe-area-inset-bottom));
+          z-index: 80;
+          width: min(34rem, calc(100vw - 1.5rem));
+          transform: translateX(-50%);
+          display: none;
+          grid-template-columns: repeat(4, minmax(0, 1fr));
+          gap: 0.25rem;
+          padding: 0.45rem;
+          border: 1px solid rgba(15,23,42,0.12);
+          border-radius: 1.15rem;
+          background: rgba(255,255,255,0.96);
+          box-shadow: 0 18px 44px rgba(15,23,42,0.18);
+          backdrop-filter: blur(18px);
+          -webkit-backdrop-filter: blur(18px);
+        }
+
+        .bottom-nav-link {
+          min-width: 0;
+          min-height: 3.65rem;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          gap: 0.18rem;
+          border-radius: 0.85rem;
+          color: var(--text-muted);
+          text-decoration: none;
+          font-size: 0.66rem;
+          font-weight: 850;
+          line-height: 1;
+          transition: background 0.18s ease, color 0.18s ease, transform 0.18s ease;
+        }
+
+        .bottom-nav-link.active {
+          color: #e11d48;
+          background: #fff1f2;
+        }
+
+        .bottom-nav-link:active {
+          transform: scale(0.97);
+        }
+
+        .bottom-nav-icon {
+          position: relative;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .bottom-cart-badge {
+          position: absolute;
+          top: -0.55rem;
+          right: -0.7rem;
+          min-width: 1rem;
+          height: 1rem;
+          padding: 0 0.25rem;
+          border-radius: 999px;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          background: #ef4444;
+          color: #ffffff;
+          border: 2px solid #ffffff;
+          font-size: 0.58rem;
+          font-weight: 900;
+        }
+
+        @media (max-width: 900px) {
+          .topbar-inner {
+            justify-content: center !important;
+            gap: 0.45rem !important;
+            padding: 0.55rem 1rem !important;
+            text-align: center;
+          }
+
+          .topbar-service {
+            width: 100%;
+            justify-content: center;
+            font-size: 0.74rem;
+          }
+
+          .topbar-contact {
+            width: 100%;
+            justify-content: center;
+            gap: 0.7rem !important;
+            font-size: 0.72rem;
+          }
+
+          .site-header-row {
+            height: 4rem !important;
+            gap: 0.65rem !important;
+          }
+
+          .brand-copy > div:first-child {
+            font-size: 0.98rem !important;
+          }
+
+          .brand-copy > div:last-child {
+            font-size: 0.62rem !important;
+            white-space: normal;
+          }
+
+          .header-actions {
+            gap: 0.4rem !important;
+          }
+
+          .header-actions > button,
+          .header-actions > a {
+            width: 2.45rem !important;
+            height: 2.45rem !important;
+          }
+
+          .site-main,
+          .site-footer {
+            padding-bottom: 5.8rem !important;
+          }
+
+          .mobile-bottom-nav {
+            display: grid;
+            left: 0.75rem;
+            right: 0.75rem;
+            width: auto;
+            bottom: max(0.75rem, env(safe-area-inset-bottom));
+            transform: none;
+          }
+        }
+
         @media (max-width: 820px) {
           .footer-grid { grid-template-columns: 1fr !important; }
         }
-        @media (max-width: 640px) {
+        @media (max-width: 900px) {
           header input { width: 9rem !important; }
         }
       `}</style>
