@@ -52,28 +52,19 @@ export function Layout() {
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', background: 'var(--bg-base)' }}>
       <div className="scroll-progress" style={{ width: `${scrollProgress}%` }} />
 
-      <header style={{
-        position: 'sticky',
-        top: 0,
-        zIndex: 50,
-        background: 'rgba(6,6,7,0.58)',
-        backdropFilter: 'saturate(180%) blur(24px)',
-        WebkitBackdropFilter: 'saturate(180%) blur(24px)',
-        borderBottom: '1px solid rgba(255,255,255,0.10)',
-        boxShadow: '0 1px 0 rgba(255,255,255,0.04) inset',
-      }}>
-        <div style={{ maxWidth: '80rem', margin: '0 auto', padding: '0 1.5rem' }}>
-          <div className="site-header-row" style={{ height: '3.8rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem' }}>
-            <Link to="/" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none', minWidth: 0 }}>
+      <header className="site-header">
+        <div className="site-header-shell">
+          <div className="site-header-row">
+            <Link to="/" className="site-brand" aria-label="PC Garage home">
               <img
                 src="/pc-garage-logo.png"
                 alt="PC Garage"
                 className="site-logo-img"
-                style={{ height: '2.9rem', width: 'auto', display: 'block', objectFit: 'contain' }}
               />
+              <span className="site-brand-text">PC Garage</span>
             </Link>
 
-            <nav className="desktop-nav" style={{ display: 'flex', alignItems: 'center', gap: '1.7rem' }}>
+            <nav className="desktop-nav header-nav" aria-label="Primary navigation">
               {navLinks.map((link) => (
                 <Link key={link.to} to={link.to} className={`nav-link ${isActive(link.to) ? 'active' : ''}`}>
                   {link.label}
@@ -81,32 +72,24 @@ export function Layout() {
               ))}
             </nav>
 
-            <div className="header-actions" style={{ display: 'flex', alignItems: 'center', gap: '0.55rem' }}>
+            <div className="header-actions">
+              <Link to="/products" className="header-cta">
+                Shop Now
+              </Link>
+
               {searchOpen && (
                 <input
                   autoFocus
                   type="text"
                   placeholder="Search products"
-                  className="input-dark"
-                  style={{ width: '12.5rem', height: '2.55rem', padding: '0 0.9rem' }}
+                  className="input-dark header-search-input"
                 />
               )}
 
               <button
                 onClick={() => setSearchOpen((value) => !value)}
                 aria-label={searchOpen ? 'Close search' : 'Open search'}
-                style={{
-                  width: '2.55rem',
-                  height: '2.55rem',
-                  borderRadius: '999px',
-                  border: '1px solid rgba(255,255,255,0.12)',
-                  background: 'rgba(255,255,255,0.08)',
-                  color: 'var(--text-secondary)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  cursor: 'pointer',
-                }}
+                className="header-icon-btn"
               >
                 {searchOpen ? <X size={17} /> : <Search size={17} />}
               </button>
@@ -114,38 +97,11 @@ export function Layout() {
               <Link
                 to="/cart"
                 aria-label="Open cart"
-                style={{
-                  width: '2.55rem',
-                  height: '2.55rem',
-                  borderRadius: '999px',
-                  border: '1px solid rgba(255,255,255,0.12)',
-                  background: 'rgba(255,255,255,0.08)',
-                  color: 'var(--text-secondary)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  textDecoration: 'none',
-                  position: 'relative',
-                }}
+                className="header-icon-btn"
               >
                 <ShoppingCart size={17} />
                 {cartCount > 0 && (
-                  <span style={{
-                    position: 'absolute',
-                    top: '-0.35rem',
-                    right: '-0.35rem',
-                    minWidth: '1.15rem',
-                    height: '1.15rem',
-                    borderRadius: '999px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    background: '#ef4444',
-                    color: 'white',
-                    fontSize: '0.66rem',
-                    fontWeight: 900,
-                    border: '2px solid #ffffff',
-                  }}>
+                  <span className="header-cart-badge">
                     {cartCount}
                   </span>
                 )}
@@ -154,20 +110,8 @@ export function Layout() {
               <button
                 id="mobile-menu-btn"
                 onClick={() => setIsMenuOpen((value) => !value)}
-                className="mobile-menu-btn"
+                className="mobile-menu-btn header-icon-btn"
                 aria-label="Toggle menu"
-                style={{
-                  width: '2.55rem',
-                  height: '2.55rem',
-                  borderRadius: '999px',
-                  border: '1px solid rgba(255,255,255,0.12)',
-                  background: 'rgba(255,255,255,0.08)',
-                  color: 'var(--text-secondary)',
-                  display: 'none',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  cursor: 'pointer',
-                }}
               >
                 {isMenuOpen ? <X size={18} /> : <Menu size={18} />}
               </button>
@@ -176,13 +120,7 @@ export function Layout() {
         </div>
 
         {isMenuOpen && (
-          <div style={{
-            borderTop: '1px solid rgba(255,255,255,0.10)',
-            background: 'rgba(6,6,7,0.78)',
-            backdropFilter: 'saturate(180%) blur(24px)',
-            WebkitBackdropFilter: 'saturate(180%) blur(24px)',
-            padding: '0.75rem 1.5rem 1rem',
-          }}>
+          <div className="mobile-header-panel">
             {navLinks.map((link) => (
               <Link
                 key={link.to}
@@ -382,25 +320,6 @@ export function Layout() {
         }
 
         @media (max-width: 900px) {
-          .site-header-row {
-            height: 4rem !important;
-            gap: 0.65rem !important;
-          }
-
-          .site-logo-img {
-            height: 2.8rem !important;
-          }
-
-          .header-actions {
-            gap: 0.4rem !important;
-          }
-
-          .header-actions > button,
-          .header-actions > a {
-            width: 2.45rem !important;
-            height: 2.45rem !important;
-          }
-
           .site-main,
           .site-footer {
             padding-bottom: 5.8rem !important;
@@ -418,9 +337,6 @@ export function Layout() {
 
         @media (max-width: 820px) {
           .footer-grid { grid-template-columns: 1fr !important; }
-        }
-        @media (max-width: 900px) {
-          header input { width: 9rem !important; }
         }
       `}</style>
     </div>
