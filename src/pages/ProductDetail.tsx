@@ -9,7 +9,7 @@ function Toast({ message, onClose }: { message: string; onClose: () => void }) {
   return (
     <div className="toast-container">
       <div className="toast animate-toast-in">
-        <div style={{ width: '2rem', height: '2rem', background: 'linear-gradient(135deg, #22c55e, #16a34a)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+        <div style={{ width: '2rem', height: '2rem', background: 'linear-gradient(135deg, #ef4444, #7f1d1d)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3"><polyline points="20 6 9 17 4 12" /></svg>
         </div>
         <div>
@@ -34,10 +34,15 @@ export function ProductDetail() {
   const addItem = useCartStore((state) => state.addItem);
   const [toast, setToast] = useState(false);
   const [qty, setQty] = useState(1);
+  const [selectedImage, setSelectedImage] = useState('');
 
   useEffect(() => {
     loadProducts();
   }, [loadProducts]);
+
+  useEffect(() => {
+    setSelectedImage(product?.image_url || '');
+  }, [product?.id, product?.image_url]);
 
   if ((isLoading || !hasLoaded) && !product) {
     return (
@@ -68,6 +73,18 @@ export function ProductDetail() {
   }
 
   const relatedProducts = products.filter((p) => p.category === product.category && p.id !== product.id).slice(0, 3);
+  const galleryImages = [product.image_url, ...(product.gallery_image_urls || [])]
+    .map((url) => url.trim())
+    .filter(Boolean)
+    .filter((url, index, urls) => urls.indexOf(url) === index);
+  const mainImage = galleryImages.includes(selectedImage) ? selectedImage : galleryImages[0];
+  const productFacts = [
+    { label: 'SKU', value: product.sku },
+    { label: 'Category', value: product.category },
+    { label: 'Availability', value: product.in_stock ? 'In stock' : 'Out of stock' },
+    { label: 'Stock quantity', value: product.stock_quantity !== undefined ? String(product.stock_quantity) : undefined },
+    { label: 'Warranty', value: product.warranty },
+  ].filter((item) => item.value);
 
   const handleAddToCart = () => {
     addItem(product, qty);
@@ -97,36 +114,81 @@ export function ProductDetail() {
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '3rem', alignItems: 'start' }} className="detail-grid">
           {/* Image Panel */}
-          <div style={{
-            borderRadius: '1.5rem',
-            overflow: 'hidden',
-            background: 'var(--bg-card)',
-            border: '1px solid var(--border-subtle)',
-            aspectRatio: '1',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            position: 'relative',
-            boxShadow: 'var(--shadow-soft)',
-          }}>
-            <div style={{ position: 'absolute', top: '1rem', left: '1rem', zIndex: 1 }}>
-              {product.in_stock
-                ? <span className="badge-green">In Stock</span>
-                : <span style={{ background: 'rgba(30,30,40,0.95)', color: 'var(--text-muted)', fontSize: '0.65rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', padding: '0.25rem 0.625rem', borderRadius: '9999px' }}>Out of Stock</span>
-              }
+          <div>
+            <div style={{
+              borderRadius: '1.5rem',
+              overflow: 'hidden',
+              background: 'var(--bg-card)',
+              border: '1px solid var(--border-subtle)',
+              aspectRatio: '1',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              position: 'relative',
+              boxShadow: 'var(--shadow-soft)',
+            }}>
+              <div style={{ position: 'absolute', top: '1rem', left: '1rem', zIndex: 1 }}>
+                {product.in_stock
+                  ? <span className="badge-green">In Stock</span>
+                  : <span style={{ background: 'rgba(30,30,40,0.95)', color: 'var(--text-muted)', fontSize: '0.65rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', padding: '0.25rem 0.625rem', borderRadius: '9999px' }}>Out of Stock</span>
+                }
+              </div>
+              {mainImage && (
+                <img
+                  src={mainImage}
+                  alt={product.name}
+                  onError={(event) => {
+                    event.currentTarget.style.display = 'none';
+                  }}
+                  style={{
+                    width: '80%', height: '80%', objectFit: 'contain',
+                    mixBlendMode: 'luminosity', opacity: 0.9,
+                    transition: 'all 0.5s ease',
+                  }}
+                  className="detail-img"
+                />
+              )}
             </div>
-            {product.image_url && (
-              <img
-                src={product.image_url}
-                alt={product.name}
-                onError={(event) => {
-                  event.currentTarget.style.display = 'none';
-                }}
+
+            {galleryImages.length > 1 && (
+              <div
                 style={{
-                  width: '80%', height: '80%', objectFit: 'contain',
-                  mixBlendMode: 'luminosity', opacity: 0.9,
-                  transition: 'all 0.5s ease',
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fill, minmax(74px, 1fr))',
+                  gap: '0.75rem',
+                  marginTop: '1rem',
                 }}
-                className="detail-img"
-              />
+              >
+                {galleryImages.map((imageUrl, index) => {
+                  const isSelected = imageUrl === mainImage;
+
+                  return (
+                    <button
+                      key={imageUrl}
+                      type="button"
+                      onClick={() => setSelectedImage(imageUrl)}
+                      aria-label={`View product image ${index + 1}`}
+                      style={{
+                        aspectRatio: '1',
+                        borderRadius: '0.75rem',
+                        border: isSelected ? '2px solid var(--red-primary)' : '1px solid var(--border-subtle)',
+                        background: 'var(--bg-card)',
+                        padding: '0.25rem',
+                        cursor: 'pointer',
+                        overflow: 'hidden',
+                        boxShadow: isSelected ? '0 10px 24px rgba(225,29,72,0.18)' : 'none',
+                      }}
+                    >
+                      <img
+                        src={imageUrl}
+                        alt={`${product.name} thumbnail ${index + 1}`}
+                        onError={(event) => {
+                          event.currentTarget.style.display = 'none';
+                        }}
+                        style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '0.55rem' }}
+                      />
+                    </button>
+                  );
+                })}
+              </div>
             )}
           </div>
 
@@ -141,7 +203,7 @@ export function ProductDetail() {
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.25rem' }}>
               <div style={{ display: 'flex', gap: '0.15rem' }}>
                 {[...Array(5)].map((_, i) => (
-                  <Star key={i} size={13} fill={i < 4 ? '#f59e0b' : 'none'} color="#f59e0b" />
+                  <Star key={i} size={13} fill={i < 4 ? '#ef4444' : 'none'} color="#ef4444" />
                 ))}
               </div>
               <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 500 }}>4.8 (124 reviews)</span>
@@ -158,11 +220,6 @@ export function ProductDetail() {
               <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 500 }}>LKR</span>
             </div>
 
-            {/* Description */}
-            <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', lineHeight: 1.75, marginBottom: '1.75rem' }}>
-              {product.description}
-            </p>
-
             {/* Features */}
             <div style={{
               background: 'var(--bg-card)',
@@ -173,9 +230,9 @@ export function ProductDetail() {
               display: 'flex', flexDirection: 'column', gap: '0.875rem',
             }}>
               {[
-                { icon: ShieldCheck, text: 'Genuine products with warranty', color: '#22c55e' },
-                { icon: Truck, text: 'Island-wide delivery available', color: '#3b82f6' },
-                { icon: Star, text: 'Top rated by 2,500+ customers', color: '#f59e0b' },
+                { icon: ShieldCheck, text: 'Genuine products with warranty', color: '#ffffff' },
+                { icon: Truck, text: 'Island-wide delivery available', color: '#ef4444' },
+                { icon: Star, text: 'Top rated by 2,500+ customers', color: '#f43f5e' },
               ].map(({ icon: Icon, text, color }) => (
                 <div key={text} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                   <div style={{ width: '2rem', height: '2rem', background: `${color}15`, border: `1px solid ${color}30`, borderRadius: '0.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
@@ -235,6 +292,64 @@ export function ProductDetail() {
           </div>
         </div>
 
+        {/* Product Details */}
+        <section
+          style={{
+            marginTop: '3rem',
+            borderTop: '1px solid var(--border-subtle)',
+            paddingTop: '2rem',
+          }}
+        >
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'minmax(0, 1fr) minmax(280px, 0.45fr)',
+              gap: '2.5rem',
+              alignItems: 'start',
+            }}
+            className="product-details-grid"
+          >
+            <div>
+              <div className="section-label" style={{ marginBottom: '0.6rem' }}>Product Details</div>
+              <h2 style={{ fontSize: '1.5rem', fontWeight: 900, color: 'var(--text-primary)', letterSpacing: '-0.03em', margin: '0 0 1rem' }}>
+                Description
+              </h2>
+              <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', lineHeight: 1.85, margin: 0, maxWidth: '58rem' }}>
+                {product.description}
+              </p>
+            </div>
+
+            <div
+              style={{
+                border: '1px solid var(--border-subtle)',
+                borderRadius: '0.875rem',
+                overflow: 'hidden',
+                background: 'var(--bg-card)',
+              }}
+            >
+              {productFacts.map((item, index) => (
+                <div
+                  key={item.label}
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: '0.9fr 1.1fr',
+                    gap: '1rem',
+                    padding: '0.9rem 1rem',
+                    borderTop: index === 0 ? 'none' : '1px solid var(--border-subtle)',
+                  }}
+                >
+                  <div style={{ color: 'var(--text-muted)', fontSize: '0.78rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                    {item.label}
+                  </div>
+                  <div style={{ color: 'var(--text-primary)', fontSize: '0.88rem', fontWeight: 700, textAlign: 'right' }}>
+                    {item.value}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
         {/* Related Products */}
         {relatedProducts.length > 0 && (
           <div style={{ marginTop: '4rem' }}>
@@ -246,7 +361,7 @@ export function ProductDetail() {
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '1rem' }}>
               {relatedProducts.map((rp) => (
                 <div key={rp.id} className="product-card">
-                  <Link to={`/product/${rp.slug || rp.id}`} style={{ display: 'block', aspectRatio: '4/3', overflow: 'hidden', background: '#f1f5f9' }}>
+                  <Link to={`/product/${rp.slug || rp.id}`} style={{ display: 'block', aspectRatio: '4/3', overflow: 'hidden', background: 'var(--bg-elevated)' }}>
                     {rp.image_url && (
                       <img
                         src={rp.image_url}
@@ -280,6 +395,7 @@ export function ProductDetail() {
       <style>{`
         @media (max-width: 768px) {
           .detail-grid { grid-template-columns: 1fr !important; gap: 1.6rem !important; }
+          .product-details-grid { grid-template-columns: 1fr !important; gap: 1.5rem !important; }
           .detail-grid > div:first-child { border-radius: 1rem !important; }
           .product-purchase-row { flex-direction: column !important; align-items: stretch !important; }
           .product-purchase-row > div,

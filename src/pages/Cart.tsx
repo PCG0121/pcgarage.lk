@@ -15,7 +15,7 @@ export function Cart() {
       }}>
         <div style={{
           width: '6rem', height: '6rem',
-          background: '#ffffff',
+          background: 'var(--bg-card)',
           border: '1px solid var(--border-subtle)',
           borderRadius: '50%',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -78,7 +78,7 @@ export function Cart() {
                   to={`/product/${item.slug || item.id}`}
                   style={{
                     width: '5rem', height: '5rem', flexShrink: 0,
-                    background: '#f8fafc',
+                    background: 'var(--bg-elevated)',
                     border: '1px solid var(--border-subtle)',
                     borderRadius: '0.75rem',
                     overflow: 'hidden',
@@ -191,7 +191,7 @@ export function Cart() {
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
               <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Delivery</span>
-              <span style={{ fontSize: '0.8rem', fontWeight: 600, color: '#22c55e' }}>Calculated at checkout</span>
+              <span style={{ fontSize: '0.8rem', fontWeight: 600, color: '#ffffff' }}>Calculated at checkout</span>
             </div>
 
             <div style={{

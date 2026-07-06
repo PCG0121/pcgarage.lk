@@ -1,10 +1,21 @@
 import { useEffect, useMemo, useState, type FormEvent } from 'react';
 import { Plus, Trash2, X, PackageCheck, Pencil, RefreshCcw } from 'lucide-react';
-import type { Product } from '../../types';
+import type { CategoryRecord, Product } from '../../types';
 import { useProductStore } from '../../store/productStore';
 
 const fallbackImage =
   'https://images.unsplash.com/photo-1593640408182-31c70c8268f5?auto=format&fit=crop&q=80&w=800';
+
+const warrantyOptions = [
+  '',
+  '3 months warranty',
+  '6 months warranty',
+  '1 year warranty',
+  '2 years warranty',
+  '3 years warranty',
+  '5 years warranty',
+  'Lifetime limited warranty',
+];
 
 function slugify(value: string) {
   return value
@@ -14,12 +25,44 @@ function slugify(value: string) {
     .replace(/^-+|-+$/g, '');
 }
 
+function parseImageUrls(value: FormDataEntryValue | null) {
+  return String(value || '')
+    .split(/[\n,]+/)
+    .map((url) => url.trim())
+    .filter(Boolean);
+}
+
+function findCategoryIdByProductName(productName: string, categories: CategoryRecord[]) {
+  const normalized = productName.toLowerCase();
+  const categoryMatches = [
+    { category: 'Laptop Batteries', keywords: ['battery', 'batteries'] },
+    { category: 'Displays', keywords: ['display', 'screen', 'lcd', 'panel'] },
+    { category: 'Keyboards', keywords: ['keyboard', 'keypad'] },
+    { category: 'SSD', keywords: ['ssd', 'nvme', 'm.2'] },
+    { category: 'RAM', keywords: ['ram', 'memory', 'ddr'] },
+    { category: 'Chargers', keywords: ['charger', 'adapter', 'power supply'] },
+    { category: 'Printers', keywords: ['printer', 'toner', 'ink'] },
+    { category: 'Accessories', keywords: ['mouse', 'cable', 'hub', 'adapter', 'accessory'] },
+  ];
+
+  const match = categoryMatches.find(({ keywords }) =>
+    keywords.some((keyword) => normalized.includes(keyword))
+  );
+
+  if (!match) return '';
+  return categories.find((category) => category.name === match.category)?.id || '';
+}
+
 function getProductSaveError(error: unknown) {
   const message = error instanceof Error ? error.message : 'Could not save product.';
   const normalized = message.toLowerCase();
 
   if (normalized.includes('row-level security')) {
     return 'Product save blocked by Supabase admin permissions. Check that this logged-in user is in public.admin_users.';
+  }
+
+  if (normalized.includes('gallery_image_urls')) {
+    return 'Gallery images need the latest Supabase migration. Run the add_product_gallery_images migration in Supabase, then try again.';
   }
 
   if (normalized.includes('duplicate key') || normalized.includes('products_slug_key')) {
@@ -34,6 +77,7 @@ export function AdminProducts() {
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [formError, setFormError] = useState('');
   const [isSaving, setIsSaving] = useState(false);
+  const [categoryId, setCategoryId] = useState('');
   const products = useProductStore((state) => state.products);
   const categories = useProductStore((state) => state.categories);
   const isUsingFallback = useProductStore((state) => state.isUsingFallback);
@@ -67,6 +111,15 @@ export function AdminProducts() {
     return editingProduct.category_id || categories.find((category) => category.name === editingProduct.category)?.id || '';
   }, [categories, editingProduct]);
 
+  useEffect(() => {
+    if (isModalOpen) setCategoryId(selectedCategoryId);
+  }, [isModalOpen, selectedCategoryId]);
+
+  const handleProductNameChange = (value: string) => {
+    const matchedCategoryId = findCategoryIdByProductName(value, categories);
+    if (matchedCategoryId) setCategoryId(matchedCategoryId);
+  };
+
   const handleSaveProduct = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const form = event.currentTarget;
@@ -79,6 +132,7 @@ export function AdminProducts() {
     const categoryName = categories.find((category) => category.id === categoryId)?.name || editingProduct?.category || 'Accessories';
     const stockQuantity = Number(formData.get('stock_quantity') || 0);
     const imageUrl = String(formData.get('image_url') || '').trim() || fallbackImage;
+    const galleryImageUrls = parseImageUrls(formData.get('gallery_image_urls')).filter((url) => url !== imageUrl);
     const description = String(formData.get('description') || '').trim();
 
     try {
@@ -92,6 +146,7 @@ export function AdminProducts() {
         sku: String(formData.get('sku') || '').trim(),
         warranty: String(formData.get('warranty') || '').trim(),
         image_url: imageUrl,
+        gallery_image_urls: galleryImageUrls,
         description: description || 'Product details will be updated soon.',
         is_active: formData.get('is_active') === 'on',
       };
@@ -270,7 +325,7 @@ export function AdminProducts() {
                   <div className="grid gap-4 sm:grid-cols-2">
                     <div className="sm:col-span-2">
                       <label className="block text-sm font-bold text-zinc-900 mb-1">Product Name</label>
-                      <input name="name" defaultValue={editingProduct?.name || ''} required type="text" placeholder="Example: Samsung 980 PRO 1TB SSD" className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:border-rose-500 focus:outline-none focus:ring-1 focus:ring-rose-500" />
+                      <input name="name" defaultValue={editingProduct?.name || ''} onChange={(event) => handleProductNameChange(event.currentTarget.value)} required type="text" placeholder="Example: Samsung 980 PRO 1TB SSD" className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:border-rose-500 focus:outline-none focus:ring-1 focus:ring-rose-500" />
                     </div>
 
                     <div className="sm:col-span-2">
@@ -280,7 +335,7 @@ export function AdminProducts() {
 
                     <div>
                       <label className="block text-sm font-bold text-zinc-900 mb-1">Category</label>
-                      <select name="category_id" defaultValue={selectedCategoryId} className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:border-rose-500 focus:outline-none focus:ring-1 focus:ring-rose-500">
+                      <select name="category_id" value={categoryId} onChange={(event) => setCategoryId(event.currentTarget.value)} className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:border-rose-500 focus:outline-none focus:ring-1 focus:ring-rose-500">
                         {categories.length === 0 && <option value="">Accessories</option>}
                         {categories.map((category) => (
                           <option key={category.id} value={category.id}>{category.name}</option>
@@ -305,7 +360,13 @@ export function AdminProducts() {
 
                     <div className="sm:col-span-2">
                       <label className="block text-sm font-bold text-zinc-900 mb-1">Warranty / Note</label>
-                      <input name="warranty" defaultValue={editingProduct?.warranty || ''} type="text" placeholder="Example: 1 year warranty" className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:border-rose-500 focus:outline-none focus:ring-1 focus:ring-rose-500" />
+                      <select name="warranty" defaultValue={editingProduct?.warranty || ''} className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:border-rose-500 focus:outline-none focus:ring-1 focus:ring-rose-500">
+                        {warrantyOptions.map((option) => (
+                          <option key={option || 'none'} value={option}>
+                            {option || 'No warranty'}
+                          </option>
+                        ))}
+                      </select>
                     </div>
 
                     <div className="sm:col-span-2">
@@ -331,6 +392,17 @@ export function AdminProducts() {
                   <div>
                     <label className="block text-sm font-bold text-zinc-900 mb-1">Product Image URL</label>
                     <input name="image_url" defaultValue={editingProduct?.image_url || ''} type="url" placeholder="https://example.com/image.jpg" className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:border-rose-500 focus:outline-none focus:ring-1 focus:ring-rose-500" />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-bold text-zinc-900 mb-1">Gallery Image URLs</label>
+                    <textarea
+                      name="gallery_image_urls"
+                      defaultValue={editingProduct?.gallery_image_urls?.join('\n') || ''}
+                      rows={5}
+                      placeholder="Paste extra image URLs, one per line"
+                      className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:border-rose-500 focus:outline-none focus:ring-1 focus:ring-rose-500"
+                    />
                   </div>
 
                   <div className="rounded-xl border border-zinc-200 bg-white p-3">

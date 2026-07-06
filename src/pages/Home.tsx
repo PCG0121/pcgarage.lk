@@ -1,5 +1,5 @@
 import {
-  ArrowRight, Award, Battery, CheckCircle2, Clock, Cpu, HardDrive,
+  ArrowRight, Award, Battery, CheckCircle2, ChevronLeft, ChevronRight, Clock, Cpu, HardDrive,
   Keyboard, Laptop, Monitor, Plus, Printer, ShieldCheck, Truck, Wrench, Zap
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -10,13 +10,13 @@ import type { Product } from '../types';
 
 const categories = [
   { name: 'SSD', icon: HardDrive, color: '#ef4444' },
-  { name: 'RAM', icon: Cpu, color: '#22c55e' },
-  { name: 'Displays', icon: Monitor, color: '#38bdf8' },
-  { name: 'Keyboards', icon: Keyboard, color: '#a78bfa' },
-  { name: 'Laptop Batteries', icon: Battery, color: '#f59e0b' },
-  { name: 'Chargers', icon: Zap, color: '#f97316' },
-  { name: 'Printers', icon: Printer, color: '#14b8a6' },
-  { name: 'Accessories', icon: Laptop, color: '#fb7185' },
+  { name: 'RAM', icon: Cpu, color: '#ffffff' },
+  { name: 'Displays', icon: Monitor, color: '#f43f5e' },
+  { name: 'Keyboards', icon: Keyboard, color: '#ffffff' },
+  { name: 'Laptop Batteries', icon: Battery, color: '#ef4444' },
+  { name: 'Chargers', icon: Zap, color: '#ffffff' },
+  { name: 'Printers', icon: Printer, color: '#f43f5e' },
+  { name: 'Accessories', icon: Laptop, color: '#ffffff' },
 ];
 
 const services = [
@@ -25,6 +25,26 @@ const services = [
   { icon: Battery, title: 'Battery Service', desc: 'OEM-grade batteries with installation support.' },
   { icon: Wrench, title: 'Thermal Cleaning', desc: 'Deep clean, paste replacement, and tune-ups.' },
 ];
+
+const heroSlides = [
+  {
+    image: 'https://ik.imagekit.io/pcg/hero/hero1',
+    mobileImage: 'https://ik.imagekit.io/pcg/hero/mobile%20/Quality%20laptop%20parts%20pc%20garage',
+    label: 'Laptop diagnostics',
+  },
+  {
+    image: '/hero/hero-2.jpg',
+    mobileImage: 'https://ik.imagekit.io/pcg/hero/mobile%20/Untitled%20(1080%20x%201440%20px).webp',
+    label: 'PC parts and accessories',
+  },
+  {
+    image: '/hero/hero-3.jpg',
+    mobileImage: '/hero/mobile-hero-3.jpg',
+    label: 'Repair bench service',
+  },
+];
+
+const mobileAfterHeroBanner = 'https://ik.imagekit.io/pcg/hero/mobile%20/banner/Untitled-design.jpg';
 
 function Toast({ message, onClose }: { message: string; onClose: () => void }) {
   return (
@@ -46,7 +66,7 @@ function Toast({ message, onClose }: { message: string; onClose: () => void }) {
 function ProductCard({ product, onAdd }: { key?: string; product: Product; onAdd: (product: Product) => void }) {
   return (
     <div className="product-card">
-      <Link to={`/product/${product.slug || product.id}`} style={{ display: 'block', position: 'relative', aspectRatio: '4/3', background: '#f1f5f9', overflow: 'hidden' }}>
+      <Link to={`/product/${product.slug || product.id}`} style={{ display: 'block', position: 'relative', aspectRatio: '4/3', background: 'var(--bg-elevated)', overflow: 'hidden' }}>
         {product.image_url && (
           <img
             src={product.image_url}
@@ -85,8 +105,8 @@ function ProductCard({ product, onAdd }: { key?: string; product: Product; onAdd
               height: '2.35rem',
               borderRadius: '0.72rem',
               border: '1px solid rgba(239,68,68,0.28)',
-              background: product.in_stock ? '#fff1f2' : '#f8fafc',
-              color: product.in_stock ? '#fb7185' : 'var(--text-muted)',
+              background: product.in_stock ? 'rgba(239,68,68,0.16)' : 'var(--bg-elevated)',
+              color: product.in_stock ? '#ffffff' : 'var(--text-muted)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -105,14 +125,42 @@ export function Home() {
   const addItem = useCartStore((state) => state.addItem);
   const products = useProductStore((state) => state.products);
   const loadProducts = useProductStore((state) => state.loadProducts);
-  const isLoading = useProductStore((state) => state.isLoading);
   const [toast, setToast] = useState<string | null>(null);
+  const [activeHeroSlide, setActiveHeroSlide] = useState(0);
+  const [isMobileHero, setIsMobileHero] = useState(false);
   const featuredProducts = products.slice(0, 4);
-  const heroProduct = products[2] ?? products[0];
+  const currentHeroSlide = heroSlides[activeHeroSlide];
+  const currentHeroImage = isMobileHero ? currentHeroSlide.mobileImage : currentHeroSlide.image;
 
   useEffect(() => {
     loadProducts();
   }, [loadProducts]);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(max-width: 640px)');
+    const updateHeroMode = () => setIsMobileHero(mediaQuery.matches);
+
+    updateHeroMode();
+    mediaQuery.addEventListener('change', updateHeroMode);
+
+    return () => mediaQuery.removeEventListener('change', updateHeroMode);
+  }, []);
+
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      setActiveHeroSlide((slide) => (slide + 1) % heroSlides.length);
+    }, 5200);
+
+    return () => window.clearInterval(timer);
+  }, []);
+
+  const showPreviousHeroSlide = () => {
+    setActiveHeroSlide((slide) => (slide - 1 + heroSlides.length) % heroSlides.length);
+  };
+
+  const showNextHeroSlide = () => {
+    setActiveHeroSlide((slide) => (slide + 1) % heroSlides.length);
+  };
 
   const handleAddToCart = (product: Product) => {
     addItem(product);
@@ -120,82 +168,77 @@ export function Home() {
     setTimeout(() => setToast(null), 2600);
   };
 
-  if (!heroProduct) {
-    return (
-      <div style={{ flex: 1, minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg-base)', color: 'var(--text-primary)', fontWeight: 800 }}>
-        {isLoading ? 'Loading products...' : 'No products available yet.'}
-      </div>
-    );
-  }
-
   return (
     <div style={{ flex: 1 }}>
       {toast && <Toast message={toast} onClose={() => setToast(null)} />}
 
-      <section className="hero-bg" style={{ padding: '3.5rem 1.5rem 2.5rem', borderBottom: '1px solid var(--border-subtle)' }}>
-        <div style={{ maxWidth: '80rem', margin: '0 auto' }}>
-          <div className="hero-grid" style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1.02fr) minmax(20rem, 0.78fr)', gap: '2rem', alignItems: 'stretch' }}>
-            <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', minHeight: '29rem' }}>
-              <div className="section-label" style={{ marginBottom: '0.9rem' }}>PC repair, parts, and upgrades</div>
-              <h1 style={{ color: 'var(--text-primary)', fontSize: '3.65rem', lineHeight: 1.02, fontWeight: 900, letterSpacing: 0, margin: '0 0 1.25rem', maxWidth: '46rem' }}>
-                Build faster. Repair smarter. Shop genuine PC parts.
-              </h1>
-              <p style={{ color: 'var(--text-secondary)', fontSize: '1rem', lineHeight: 1.75, margin: '0 0 1.7rem', maxWidth: '35rem' }}>
-                PC Garage helps you buy trusted components and fix laptops quickly with clear pricing, WhatsApp ordering, and island-wide delivery.
-              </p>
-
-              <div className="hero-actions" style={{ display: 'flex', gap: '0.85rem', flexWrap: 'wrap', marginBottom: '2rem' }}>
-                <Link to="/products" className="btn-glow" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', textDecoration: 'none' }}>
-                  Shop products <ArrowRight size={16} />
-                </Link>
-                <a href={`https://wa.me/${import.meta.env.VITE_WHATSAPP_NUMBER || '94700000000'}`} target="_blank" rel="noopener noreferrer" className="btn-outline-glow" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', textDecoration: 'none' }}>
-                  Get repair quote
-                </a>
+      <section
+        className="hero-modern"
+        style={{
+          padding: '1.5rem',
+          borderBottom: '1px solid var(--border-subtle)',
+          background: '#060607',
+          position: 'relative',
+        }}
+      >
+        <div style={{ width: '100%', maxWidth: '80rem', margin: '0 auto' }}>
+          <div className="electro-hero-grid" style={{ display: 'grid', gridTemplateColumns: '16.5rem minmax(0, 1fr)', gap: '1rem', alignItems: 'stretch' }}>
+            <aside className="electro-departments" style={{ background: 'var(--bg-card)', border: '1px solid var(--border-subtle)', borderRadius: '0.9rem', overflow: 'hidden' }}>
+              <div style={{ padding: '0.95rem 1rem', background: '#dc2626', color: '#ffffff', fontSize: '0.88rem', fontWeight: 900 }}>
+                All Departments
               </div>
-
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: '0.75rem', maxWidth: '38rem' }} className="trust-grid">
-                {[
-                  { icon: ShieldCheck, title: 'Warranty', text: 'Genuine parts' },
-                  { icon: Truck, title: 'Delivery', text: 'Across Sri Lanka' },
-                  { icon: Clock, title: 'Fast repair', text: 'Same-day checks' },
-                ].map(({ icon: Icon, title, text }) => (
-                  <div key={title} style={{ padding: '0.9rem', border: '1px solid var(--border-subtle)', borderRadius: '0.85rem', background: '#ffffff' }}>
-                    <Icon size={18} color="var(--red-bright)" />
-                    <div style={{ color: 'var(--text-primary)', fontSize: '0.82rem', fontWeight: 800, marginTop: '0.55rem' }}>{title}</div>
-                    <div style={{ color: 'var(--text-muted)', fontSize: '0.75rem', marginTop: '0.15rem' }}>{text}</div>
-                  </div>
+              <div>
+                {categories.map(({ name, icon: Icon }) => (
+                  <Link
+                    key={name}
+                    to={`/products?category=${name}`}
+                    className="electro-department-link"
+                  >
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.7rem', minWidth: 0 }}>
+                      <Icon size={16} color="var(--red-bright)" />
+                      <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{name}</span>
+                    </span>
+                    <ChevronRight size={14} />
+                  </Link>
                 ))}
               </div>
-            </div>
+            </aside>
 
-            <div style={{ border: '1px solid var(--border-subtle)', borderRadius: '1.2rem', overflow: 'hidden', background: '#ffffff', boxShadow: 'var(--shadow-soft)' }}>
-              <Link to={`/product/${heroProduct.slug || heroProduct.id}`} style={{ display: 'block', height: '22rem', background: '#f1f5f9', overflow: 'hidden' }}>
-                {heroProduct.image_url && (
-                  <img
-                    src={heroProduct.image_url}
-                    alt={heroProduct.name}
-                    onError={(event) => {
-                      event.currentTarget.style.display = 'none';
-                    }}
-                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                  />
-                )}
-              </Link>
-              <div style={{ padding: '1.25rem' }}>
-                <span className="badge-red">Featured deal</span>
-                <h2 style={{ color: 'var(--text-primary)', fontSize: '1.25rem', lineHeight: 1.28, fontWeight: 900, margin: '0.9rem 0 0.55rem' }}>
-                  {heroProduct.name}
-                </h2>
-                <p style={{ color: 'var(--text-muted)', fontSize: '0.86rem', lineHeight: 1.6, margin: '0 0 1rem' }}>
-                  {heroProduct.description}
-                </p>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem' }}>
-                  <div style={{ color: 'var(--text-primary)', fontSize: '1.35rem', fontWeight: 900 }}>
-                    Rs. {heroProduct.price.toLocaleString()}
-                  </div>
-                  <button onClick={() => handleAddToCart(heroProduct)} className="btn-glow" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.45rem' }}>
-                    Add <Plus size={16} />
+            <div
+              className="electro-main-slide"
+              style={{
+                minHeight: '32rem',
+                borderRadius: '0.9rem',
+                border: '1px solid var(--border-subtle)',
+                overflow: 'hidden',
+                position: 'relative',
+                backgroundImage: `linear-gradient(90deg, rgba(5,5,6,0.18), rgba(5,5,6,0.08)), url("${currentHeroImage}")`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                transition: 'background-image 0.45s ease',
+              }}
+            >
+              <div className="hero-carousel-controls" aria-label="Hero image carousel">
+                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                  <button type="button" onClick={showPreviousHeroSlide} aria-label="Previous hero image" className="hero-carousel-btn">
+                    <ChevronLeft size={18} />
                   </button>
+                  <button type="button" onClick={showNextHeroSlide} aria-label="Next hero image" className="hero-carousel-btn">
+                    <ChevronRight size={18} />
+                  </button>
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.55rem' }}>
+                  {heroSlides.map((slide, index) => (
+                    <button
+                      key={slide.label}
+                      type="button"
+                      onClick={() => setActiveHeroSlide(index)}
+                      aria-label={`Show ${slide.label}`}
+                      aria-current={index === activeHeroSlide}
+                      className={`hero-carousel-dot ${index === activeHeroSlide ? 'active' : ''}`}
+                    />
+                  ))}
                 </div>
               </div>
             </div>
@@ -203,7 +246,16 @@ export function Home() {
         </div>
       </section>
 
-      <section style={{ padding: '1.35rem 1.5rem', background: '#f8fafc', borderBottom: '1px solid var(--border-subtle)' }}>
+      <Link
+        to="/products"
+        className="mobile-after-hero-banner"
+        aria-label="Browse PC Garage products"
+        style={{
+          backgroundImage: `linear-gradient(90deg, rgba(5,5,6,0.10), rgba(5,5,6,0.04)), url("${mobileAfterHeroBanner}")`,
+        }}
+      />
+
+      <section style={{ padding: '1.35rem 1.5rem', background: '#0b0b0d', borderBottom: '1px solid var(--border-subtle)' }}>
         <div style={{ maxWidth: '80rem', margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: '0.75rem' }} className="stats-grid">
           {[
             ['100+', 'Products in stock'],
@@ -244,7 +296,7 @@ export function Home() {
         </div>
       </section>
 
-      <section style={{ padding: '3rem 1.5rem', background: '#f8fafc', borderTop: '1px solid var(--border-subtle)', borderBottom: '1px solid var(--border-subtle)' }}>
+      <section style={{ padding: '3rem 1.5rem', background: '#0b0b0d', borderTop: '1px solid var(--border-subtle)', borderBottom: '1px solid var(--border-subtle)' }}>
         <div style={{ maxWidth: '80rem', margin: '0 auto' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', gap: '1rem', alignItems: 'end', marginBottom: '1.4rem', flexWrap: 'wrap' }}>
             <div>
@@ -293,25 +345,115 @@ export function Home() {
 
       <style>{`
         .product-card:hover .product-img { transform: scale(1.04); opacity: 1 !important; }
+        .electro-department-link {
+          min-height: 3rem;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 0.75rem;
+          padding: 0 1rem;
+          border-top: 1px solid var(--border-subtle);
+          color: var(--text-secondary);
+          text-decoration: none;
+          font-size: 0.82rem;
+          font-weight: 800;
+          transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease;
+        }
+        .electro-department-link:hover {
+          color: #ffffff;
+          background: rgba(239,68,68,0.14);
+          border-color: rgba(239,68,68,0.28);
+        }
+        .hero-carousel-controls {
+          position: absolute;
+          left: 3.25rem;
+          right: 3.25rem;
+          bottom: 1.4rem;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 1rem;
+          z-index: 2;
+          pointer-events: auto;
+        }
+        .hero-carousel-btn {
+          width: 2.35rem;
+          height: 2.35rem;
+          border-radius: 999px;
+          border: 1px solid rgba(255,255,255,0.22);
+          background: rgba(8,8,9,0.58);
+          color: #ffffff;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          backdrop-filter: blur(14px);
+          -webkit-backdrop-filter: blur(14px);
+          transition: background 0.18s ease, border-color 0.18s ease, transform 0.18s ease;
+        }
+        .hero-carousel-btn:hover {
+          background: #dc2626;
+          border-color: rgba(239,68,68,0.70);
+          transform: translateY(-1px);
+        }
+        .hero-carousel-dot {
+          width: 0.62rem;
+          height: 0.62rem;
+          border-radius: 999px;
+          border: 1px solid rgba(255,255,255,0.44);
+          background: rgba(255,255,255,0.24);
+          cursor: pointer;
+          padding: 0;
+          transition: width 0.18s ease, background 0.18s ease, border-color 0.18s ease;
+        }
+        .hero-carousel-dot.active {
+          width: 2rem;
+          background: #ef4444;
+          border-color: #ef4444;
+        }
+        .mobile-after-hero-banner {
+          display: none;
+        }
         @media (max-width: 980px) {
-          .hero-grid, .service-grid { grid-template-columns: 1fr !important; }
+          .electro-hero-grid, .hero-grid, .service-grid { grid-template-columns: 1fr !important; }
+          .electro-departments { order: 2; }
+          .electro-main-slide { order: 1; min-height: 28rem !important; }
+          .hero-modern { min-height: auto !important; }
           .category-strip { grid-template-columns: repeat(4, minmax(0, 1fr)) !important; }
           .products-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
           .stats-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
         }
         @media (max-width: 640px) {
-          .hero-bg { padding: 2.2rem 1rem 1.75rem !important; }
-          .hero-grid h1 { font-size: 2.05rem !important; line-height: 1.08 !important; }
-          .hero-grid p { font-size: 0.94rem !important; }
-          .hero-grid > div:first-child { min-height: 0 !important; }
-          .hero-actions {
-            display: grid !important;
-            grid-template-columns: 1fr !important;
+          .mobile-after-hero-banner {
+            display: block;
+            width: calc(100% - 2rem);
+            max-width: 40rem;
+            aspect-ratio: 16 / 7;
+            margin: 0.25rem auto 1rem;
+            border: 1px solid var(--border-subtle);
+            border-radius: 0.9rem;
+            background-color: #111113;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            overflow: hidden;
+            box-shadow: var(--shadow-card);
           }
-          .hero-actions a {
-            justify-content: center !important;
+          .hero-modern { padding: 1rem !important; }
+          .electro-departments { display: none !important; }
+          .electro-main-slide {
+            min-height: 0 !important;
+            aspect-ratio: 3 / 4 !important;
+            background-size: contain !important;
+            background-repeat: no-repeat !important;
+            background-position: center !important;
+            background-color: #060607 !important;
           }
-          .hero-grid > div:last-child a:first-child { height: 15rem !important; }
+          .hero-carousel-controls {
+            left: 1.35rem !important;
+            right: 1.35rem !important;
+            bottom: 1rem !important;
+          }
           .trust-grid, .repair-grid, .products-grid, .stats-grid { grid-template-columns: 1fr !important; }
           .category-strip { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
         }

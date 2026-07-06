@@ -18,6 +18,7 @@ create table if not exists public.products (
   price numeric(12, 2) not null check (price >= 0),
   category_id uuid references public.categories(id) on delete set null,
   image_url text not null default '',
+  gallery_image_urls text[] not null default '{}',
   sku text,
   warranty text,
   stock_quantity integer not null default 0 check (stock_quantity >= 0),

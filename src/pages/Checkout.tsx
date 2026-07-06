@@ -70,7 +70,7 @@ export function Checkout() {
 
   const inputStyle = (field: string) => ({
     width: '100%',
-    background: '#ffffff',
+    background: 'var(--bg-card)',
     border: `1px solid ${focusedField === field ? 'rgba(225,29,72,0.45)' : 'var(--border-subtle)'}`,
     borderRadius: '0.75rem',
     color: 'var(--text-primary)',
@@ -119,7 +119,7 @@ export function Checkout() {
                 <span style={{ fontSize: '0.65rem', fontWeight: 600, color: i === step ? '#f87171' : 'var(--text-muted)', letterSpacing: '0.06em', textTransform: 'uppercase' }}>{s}</span>
               </div>
               {i < steps.length - 1 && (
-                <div style={{ width: '4rem', height: '1px', background: i < step ? '#22c55e' : 'rgba(15,23,42,0.12)', margin: '0 0.5rem', marginBottom: '1.1rem', transition: 'background 0.4s ease' }} />
+                <div style={{ width: '4rem', height: '1px', background: i < step ? '#ef4444' : 'rgba(255,255,255,0.12)', margin: '0 0.5rem', marginBottom: '1.1rem', transition: 'background 0.4s ease' }} />
               )}
             </div>
           ))}
@@ -239,13 +239,13 @@ export function Checkout() {
               <>
                 <h2 style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                   <div style={{ width: '1.75rem', height: '1.75rem', background: 'rgba(34,197,94,0.1)', border: '1px solid rgba(34,197,94,0.2)', borderRadius: '0.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <CheckCircle size={13} color="#22c55e" />
+                    <CheckCircle size={13} color="#ef4444" />
                   </div>
                   Confirm Order
                 </h2>
 
                 {/* Customer Summary */}
-                <div style={{ background: '#f8fafc', border: '1px solid var(--border-subtle)', borderRadius: '0.875rem', padding: '1.25rem', marginBottom: '1.25rem' }}>
+                <div style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border-subtle)', borderRadius: '0.875rem', padding: '1.25rem', marginBottom: '1.25rem' }}>
                   <div className="section-label" style={{ marginBottom: '0.875rem' }}>Delivery to</div>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                     {[['Name', formData.name], ['Phone', formData.phone], ['Address', `${formData.address}, ${formData.city}`]].map(([k, v]) => (
@@ -263,7 +263,7 @@ export function Checkout() {
                 {/* Order Items */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.625rem', marginBottom: '1.5rem' }}>
                   {items.map((item) => (
-                    <div key={item.id} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.75rem', background: '#f8fafc', borderRadius: '0.625rem' }}>
+                    <div key={item.id} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.75rem', background: 'var(--bg-elevated)', borderRadius: '0.625rem' }}>
                       <img src={item.image_url} alt={item.name} style={{ width: '2.5rem', height: '2.5rem', objectFit: 'cover', borderRadius: '0.375rem', mixBlendMode: 'luminosity', opacity: 0.85 }} />
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <div style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{item.name}</div>

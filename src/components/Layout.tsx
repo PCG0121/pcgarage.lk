@@ -1,5 +1,5 @@
 import { Link, Outlet, useLocation } from 'react-router-dom';
-import { Menu, Search, ShoppingCart, Wrench, X, Cpu, ChevronRight, MapPin, Phone, Home as HomeIcon, Package, Grid3X3 } from 'lucide-react';
+import { Menu, Search, ShoppingCart, X, Cpu, ChevronRight, Home as HomeIcon, Package, Grid3X3 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useCartStore } from '../store/cartStore';
 
@@ -52,70 +52,25 @@ export function Layout() {
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', background: 'var(--bg-base)' }}>
       <div className="scroll-progress" style={{ width: `${scrollProgress}%` }} />
 
-      <div style={{
-        background: '#ffffff',
-        borderBottom: '1px solid var(--border-subtle)',
-        color: 'var(--text-secondary)',
-        fontSize: '0.78rem',
-      }}>
-        <div className="topbar-inner" style={{
-          maxWidth: '80rem',
-          margin: '0 auto',
-          padding: '0.55rem 1.5rem',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          gap: '1rem',
-          flexWrap: 'wrap',
-        }}>
-          <span className="topbar-service" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.45rem', fontWeight: 700 }}>
-            <Wrench size={14} color="var(--red-bright)" />
-            Same-day diagnostics and trusted PC repairs
-          </span>
-          <span className="topbar-contact" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.9rem', color: 'var(--text-muted)' }}>
-            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}>
-              <MapPin size={13} /> Kurunegala
-            </span>
-            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}>
-              <Phone size={13} /> +94 70 000 0000
-            </span>
-          </span>
-        </div>
-      </div>
-
       <header style={{
         position: 'sticky',
         top: 0,
         zIndex: 50,
-        background: 'rgba(255,255,255,0.92)',
-        backdropFilter: 'blur(18px)',
-        WebkitBackdropFilter: 'blur(18px)',
-        borderBottom: '1px solid var(--border-subtle)',
+        background: 'rgba(6,6,7,0.58)',
+        backdropFilter: 'saturate(180%) blur(24px)',
+        WebkitBackdropFilter: 'saturate(180%) blur(24px)',
+        borderBottom: '1px solid rgba(255,255,255,0.10)',
+        boxShadow: '0 1px 0 rgba(255,255,255,0.04) inset',
       }}>
         <div style={{ maxWidth: '80rem', margin: '0 auto', padding: '0 1.5rem' }}>
-          <div className="site-header-row" style={{ height: '4.35rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem' }}>
-            <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', textDecoration: 'none', minWidth: 0 }}>
-              <div style={{
-                width: '2.55rem',
-                height: '2.55rem',
-                borderRadius: '0.8rem',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                background: 'linear-gradient(135deg, #ef4444, #f97316)',
-                boxShadow: '0 12px 30px rgba(239,68,68,0.22)',
-                flexShrink: 0,
-              }}>
-                <Cpu size={19} color="white" />
-              </div>
-              <div className="brand-copy" style={{ lineHeight: 1.08, minWidth: 0 }}>
-                <div style={{ fontSize: '1.05rem', fontWeight: 900, color: 'var(--text-primary)', letterSpacing: 0 }}>
-                  PC Garage
-                </div>
-                <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)', fontWeight: 700 }}>
-                  Hardware and repair store
-                </div>
-              </div>
+          <div className="site-header-row" style={{ height: '3.8rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem' }}>
+            <Link to="/" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none', minWidth: 0 }}>
+              <img
+                src="/pc-garage-logo.png"
+                alt="PC Garage"
+                className="site-logo-img"
+                style={{ height: '2.9rem', width: 'auto', display: 'block', objectFit: 'contain' }}
+              />
             </Link>
 
             <nav className="desktop-nav" style={{ display: 'flex', alignItems: 'center', gap: '1.7rem' }}>
@@ -143,9 +98,9 @@ export function Layout() {
                 style={{
                   width: '2.55rem',
                   height: '2.55rem',
-                  borderRadius: '0.75rem',
-                  border: '1px solid var(--border-subtle)',
-                  background: '#ffffff',
+                  borderRadius: '999px',
+                  border: '1px solid rgba(255,255,255,0.12)',
+                  background: 'rgba(255,255,255,0.08)',
                   color: 'var(--text-secondary)',
                   display: 'flex',
                   alignItems: 'center',
@@ -162,9 +117,9 @@ export function Layout() {
                 style={{
                   width: '2.55rem',
                   height: '2.55rem',
-                  borderRadius: '0.75rem',
-                  border: '1px solid var(--border-subtle)',
-                  background: '#ffffff',
+                  borderRadius: '999px',
+                  border: '1px solid rgba(255,255,255,0.12)',
+                  background: 'rgba(255,255,255,0.08)',
                   color: 'var(--text-secondary)',
                   display: 'flex',
                   alignItems: 'center',
@@ -204,9 +159,9 @@ export function Layout() {
                 style={{
                   width: '2.55rem',
                   height: '2.55rem',
-                  borderRadius: '0.75rem',
-                  border: '1px solid var(--border-subtle)',
-                  background: '#ffffff',
+                  borderRadius: '999px',
+                  border: '1px solid rgba(255,255,255,0.12)',
+                  background: 'rgba(255,255,255,0.08)',
                   color: 'var(--text-secondary)',
                   display: 'none',
                   alignItems: 'center',
@@ -222,8 +177,10 @@ export function Layout() {
 
         {isMenuOpen && (
           <div style={{
-            borderTop: '1px solid var(--border-subtle)',
-            background: 'rgba(255,255,255,0.98)',
+            borderTop: '1px solid rgba(255,255,255,0.10)',
+            background: 'rgba(6,6,7,0.78)',
+            backdropFilter: 'saturate(180%) blur(24px)',
+            WebkitBackdropFilter: 'saturate(180%) blur(24px)',
             padding: '0.75rem 1.5rem 1rem',
           }}>
             {navLinks.map((link) => (
@@ -270,7 +227,7 @@ export function Layout() {
       </nav>
 
       <footer className="site-footer" style={{
-        background: '#ffffff',
+        background: '#080809',
         borderTop: '1px solid var(--border-subtle)',
         marginTop: 'auto',
       }}>
@@ -291,7 +248,7 @@ export function Layout() {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                background: 'linear-gradient(135deg, #ef4444, #f97316)',
+                background: 'linear-gradient(135deg, #ef4444, #7f1d1d)',
               }}>
                 <Cpu size={18} color="white" />
               </div>
@@ -365,9 +322,9 @@ export function Layout() {
           grid-template-columns: repeat(4, minmax(0, 1fr));
           gap: 0.25rem;
           padding: 0.45rem;
-          border: 1px solid rgba(15,23,42,0.12);
+          border: 1px solid rgba(255,255,255,0.12);
           border-radius: 1.15rem;
-          background: rgba(255,255,255,0.96);
+          background: rgba(12,12,14,0.96);
           box-shadow: 0 18px 44px rgba(15,23,42,0.18);
           backdrop-filter: blur(18px);
           -webkit-backdrop-filter: blur(18px);
@@ -391,8 +348,8 @@ export function Layout() {
         }
 
         .bottom-nav-link.active {
-          color: #e11d48;
-          background: #fff1f2;
+          color: #ffffff;
+          background: #dc2626;
         }
 
         .bottom-nav-link:active {
@@ -425,38 +382,13 @@ export function Layout() {
         }
 
         @media (max-width: 900px) {
-          .topbar-inner {
-            justify-content: center !important;
-            gap: 0.45rem !important;
-            padding: 0.55rem 1rem !important;
-            text-align: center;
-          }
-
-          .topbar-service {
-            width: 100%;
-            justify-content: center;
-            font-size: 0.74rem;
-          }
-
-          .topbar-contact {
-            width: 100%;
-            justify-content: center;
-            gap: 0.7rem !important;
-            font-size: 0.72rem;
-          }
-
           .site-header-row {
             height: 4rem !important;
             gap: 0.65rem !important;
           }
 
-          .brand-copy > div:first-child {
-            font-size: 0.98rem !important;
-          }
-
-          .brand-copy > div:last-child {
-            font-size: 0.62rem !important;
-            white-space: normal;
+          .site-logo-img {
+            height: 2.8rem !important;
           }
 
           .header-actions {

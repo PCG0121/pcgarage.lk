@@ -170,6 +170,12 @@ values ('AUTH_USER_UUID_HERE', 'admin@pcgarage.lk');
 
 Products are stored in Supabase `products`, categories in `categories`, and checkout orders in `orders`. Product images should be hosted as public URLs. The app saves only `products.image_url`, not base64 image data.
 
+Product gallery images are saved as public image URLs in `products.gallery_image_urls`. If your database was created before gallery support was added, run this migration in the Supabase SQL Editor:
+
+```text
+supabase/migrations/20260706065749_add_product_gallery_images.sql
+```
+
 ## Cloudflare Pages Deployment
 
 Use these Cloudflare Pages settings:

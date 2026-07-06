@@ -37,7 +37,7 @@ export function AdminLogin() {
 
   const inputStyle = (field: string) => ({
     width: '100%',
-    background: '#ffffff',
+    background: 'var(--bg-card)',
     border: `1px solid ${error ? 'rgba(225,29,72,0.4)' : focusedField === field ? 'rgba(225,29,72,0.45)' : 'var(--border-subtle)'}`,
     borderRadius: '0.75rem',
     color: 'var(--text-primary)',
@@ -177,7 +177,7 @@ export function AdminLogin() {
 
           <div style={{
             marginTop: '1.5rem',
-            background: '#f8fafc',
+            background: 'var(--bg-elevated)',
             border: '1px solid var(--border-subtle)',
             borderRadius: '0.75rem',
             padding: '0.875rem 1rem',

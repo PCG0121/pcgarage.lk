@@ -10,7 +10,7 @@ function Toast({ message, onClose }: { message: string; onClose: () => void }) {
   return (
     <div className="toast-container">
       <div className="toast animate-toast-in">
-        <div style={{ width: '2rem', height: '2rem', background: 'linear-gradient(135deg, #22c55e, #16a34a)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+        <div style={{ width: '2rem', height: '2rem', background: 'linear-gradient(135deg, #ef4444, #7f1d1d)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3"><polyline points="20 6 9 17 4 12" /></svg>
         </div>
         <div>
@@ -108,7 +108,7 @@ export function ProductList() {
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value as any)}
                   style={{
-                    background: '#ffffff',
+                    background: 'var(--bg-card)',
                     border: '1px solid var(--border-subtle)',
                     borderRadius: '0.625rem',
                     color: 'var(--text-primary)',
@@ -140,9 +140,9 @@ export function ProductList() {
               display: 'flex',
               alignItems: 'flex-start',
               gap: '0.75rem',
-              background: '#fff7ed',
-              border: '1px solid #fed7aa',
-              color: '#9a3412',
+              background: 'rgba(239,68,68,0.12)',
+              border: '1px solid rgba(239,68,68,0.32)',
+              color: 'var(--text-secondary)',
               borderRadius: '0.875rem',
               padding: '0.875rem 1rem',
               marginBottom: '1rem',
@@ -153,7 +153,7 @@ export function ProductList() {
           >
             <AlertCircle size={18} style={{ flexShrink: 0, marginTop: '0.1rem' }} />
             <div>
-              <div style={{ color: '#7c2d12', fontWeight: 800, marginBottom: '0.1rem' }}>Products could not be loaded</div>
+              <div style={{ color: '#ffffff', fontWeight: 800, marginBottom: '0.1rem' }}>Products could not be loaded</div>
               <div>Please refresh the page or check the Supabase deployment environment variables.</div>
             </div>
           </div>
@@ -183,7 +183,7 @@ export function ProductList() {
         {/* Products Grid */}
         {isLoading ? (
           <div style={{ textAlign: 'center', padding: '5rem 1rem', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem', color: 'var(--text-primary)' }}>
-            <div style={{ width: '5rem', height: '5rem', background: '#ffffff', border: '1px solid var(--border-subtle)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ width: '5rem', height: '5rem', background: 'var(--bg-card)', border: '1px solid var(--border-subtle)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <LoaderCircle size={30} color="var(--red-primary)" className="product-loading-icon" />
             </div>
             <h3 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--text-primary)', margin: 0 }}>Loading products...</h3>
@@ -191,7 +191,7 @@ export function ProductList() {
           </div>
         ) : filteredProducts.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '5rem 1rem', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem' }}>
-            <div style={{ width: '5rem', height: '5rem', background: '#ffffff', border: '1px solid var(--border-subtle)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ width: '5rem', height: '5rem', background: 'var(--bg-card)', border: '1px solid var(--border-subtle)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <ShoppingCart size={30} color="var(--text-muted)" />
             </div>
             <h3 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--text-primary)', margin: 0 }}>No products found</h3>
@@ -216,7 +216,7 @@ export function ProductList() {
                 className="product-card animate-fade-in-up"
                 style={{ animationDelay: `${Math.min(i * 0.06, 0.5)}s`, animationFillMode: 'both' }}
               >
-                <Link className="product-image-link" to={`/product/${product.slug || product.id}`} style={{ display: 'block', position: 'relative', overflow: 'hidden', aspectRatio: '4/3', background: '#f1f5f9' }}>
+                <Link className="product-image-link" to={`/product/${product.slug || product.id}`} style={{ display: 'block', position: 'relative', overflow: 'hidden', aspectRatio: '4/3', background: 'var(--bg-elevated)' }}>
                   {product.image_url && (
                     <img
                       src={product.image_url}
@@ -253,7 +253,7 @@ export function ProductList() {
                       disabled={!product.in_stock}
                       style={{
                         width: '2.25rem', height: '2.25rem',
-                        background: product.in_stock ? '#fff1f2' : '#f8fafc',
+                        background: product.in_stock ? 'rgba(239,68,68,0.16)' : 'var(--bg-elevated)',
                         border: `1px solid ${product.in_stock ? 'rgba(225,29,72,0.22)' : 'var(--border-subtle)'}`,
                         borderRadius: '0.625rem',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -297,7 +297,7 @@ export function ProductList() {
             gap: 0.55rem !important;
           }
         }
-        select option { background: #ffffff; color: #0f172a; }
+        select option { background: #111113; color: #ffffff; }
       `}</style>
     </div>
   );

@@ -17,14 +17,14 @@ const categoryIcons: Record<string, any> = {
 };
 
 const categoryColors: Record<string, { bg: string; border: string; text: string; glow: string }> = {
-  'Laptop Batteries': { bg: 'rgba(245,158,11,0.1)', border: 'rgba(245,158,11,0.2)', text: '#f59e0b', glow: 'rgba(245,158,11,0.1)' },
-  'Keyboards':        { bg: 'rgba(59,130,246,0.1)', border: 'rgba(59,130,246,0.2)', text: '#3b82f6', glow: 'rgba(59,130,246,0.1)' },
-  'Displays':         { bg: 'rgba(168,85,247,0.1)', border: 'rgba(168,85,247,0.2)', text: '#a855f7', glow: 'rgba(168,85,247,0.1)' },
-  'SSD':              { bg: 'rgba(239,68,68,0.1)', border: 'rgba(239,68,68,0.2)', text: '#ef4444', glow: 'rgba(239,68,68,0.1)' },
-  'RAM':              { bg: 'rgba(34,197,94,0.1)', border: 'rgba(34,197,94,0.2)', text: '#22c55e', glow: 'rgba(34,197,94,0.1)' },
-  'Chargers':         { bg: 'rgba(251,191,36,0.1)', border: 'rgba(251,191,36,0.2)', text: '#fbbf24', glow: 'rgba(251,191,36,0.1)' },
-  'Printers':         { bg: 'rgba(20,184,166,0.1)', border: 'rgba(20,184,166,0.2)', text: '#14b8a6', glow: 'rgba(20,184,166,0.1)' },
-  'Accessories':      { bg: 'rgba(99,102,241,0.1)', border: 'rgba(99,102,241,0.2)', text: '#6366f1', glow: 'rgba(99,102,241,0.1)' },
+  'Laptop Batteries': { bg: 'rgba(239,68,68,0.14)', border: 'rgba(239,68,68,0.32)', text: '#ef4444', glow: 'rgba(239,68,68,0.12)' },
+  'Keyboards':        { bg: 'rgba(255,255,255,0.08)', border: 'rgba(255,255,255,0.20)', text: '#ffffff', glow: 'rgba(255,255,255,0.08)' },
+  'Displays':         { bg: 'rgba(244,63,94,0.14)', border: 'rgba(244,63,94,0.32)', text: '#f43f5e', glow: 'rgba(244,63,94,0.12)' },
+  'SSD':              { bg: 'rgba(239,68,68,0.14)', border: 'rgba(239,68,68,0.32)', text: '#ef4444', glow: 'rgba(239,68,68,0.12)' },
+  'RAM':              { bg: 'rgba(255,255,255,0.08)', border: 'rgba(255,255,255,0.20)', text: '#ffffff', glow: 'rgba(255,255,255,0.08)' },
+  'Chargers':         { bg: 'rgba(239,68,68,0.14)', border: 'rgba(239,68,68,0.32)', text: '#ef4444', glow: 'rgba(239,68,68,0.12)' },
+  'Printers':         { bg: 'rgba(244,63,94,0.14)', border: 'rgba(244,63,94,0.32)', text: '#f43f5e', glow: 'rgba(244,63,94,0.12)' },
+  'Accessories':      { bg: 'rgba(255,255,255,0.08)', border: 'rgba(255,255,255,0.20)', text: '#ffffff', glow: 'rgba(255,255,255,0.08)' },
 };
 
 export function Categories() {
@@ -43,7 +43,7 @@ export function Categories() {
     <div style={{ flex: 1, background: 'var(--bg-base)' }}>
       {/* Hero */}
       <div style={{
-        background: 'linear-gradient(135deg, rgba(239,68,68,0.06) 0%, rgba(59,130,246,0.04) 50%, transparent 100%)',
+        background: 'linear-gradient(135deg, rgba(239,68,68,0.14) 0%, rgba(255,255,255,0.04) 50%, transparent 100%)',
         borderBottom: '1px solid var(--border-subtle)',
         padding: '3.5rem 1.5rem 3rem',
         textAlign: 'center',
@@ -68,9 +68,9 @@ export function Categories() {
               display: 'flex',
               alignItems: 'flex-start',
               gap: '0.75rem',
-              background: '#fff7ed',
-              border: '1px solid #fed7aa',
-              color: '#9a3412',
+              background: 'rgba(239,68,68,0.12)',
+              border: '1px solid rgba(239,68,68,0.32)',
+              color: 'var(--text-secondary)',
               borderRadius: '0.875rem',
               padding: '0.875rem 1rem',
               marginBottom: '1.5rem',
@@ -81,7 +81,7 @@ export function Categories() {
           >
             <AlertCircle size={18} style={{ flexShrink: 0, marginTop: '0.1rem' }} />
             <div>
-              <div style={{ color: '#7c2d12', fontWeight: 800, marginBottom: '0.1rem' }}>Categories could not be loaded</div>
+              <div style={{ color: '#ffffff', fontWeight: 800, marginBottom: '0.1rem' }}>Categories could not be loaded</div>
               <div>Please refresh the page or check the Supabase deployment environment variables.</div>
             </div>
           </div>
@@ -89,7 +89,7 @@ export function Categories() {
 
         {isLoading ? (
           <div style={{ textAlign: 'center', padding: '4rem 1rem', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem', color: 'var(--text-primary)' }}>
-            <div style={{ width: '5rem', height: '5rem', background: '#ffffff', border: '1px solid var(--border-subtle)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ width: '5rem', height: '5rem', background: 'var(--bg-card)', border: '1px solid var(--border-subtle)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <LoaderCircle size={30} color="var(--red-primary)" className="category-loading-icon" />
             </div>
             <h3 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--text-primary)', margin: 0 }}>Loading categories...</h3>
@@ -97,7 +97,7 @@ export function Categories() {
           </div>
         ) : categories.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '4rem 1rem', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem', color: 'var(--text-primary)' }}>
-            <div style={{ width: '5rem', height: '5rem', background: '#ffffff', border: '1px solid var(--border-subtle)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ width: '5rem', height: '5rem', background: 'var(--bg-card)', border: '1px solid var(--border-subtle)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <Laptop size={30} color="var(--text-muted)" />
             </div>
             <h3 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--text-primary)', margin: 0 }}>No categories found</h3>

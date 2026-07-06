@@ -11,6 +11,7 @@ type ProductInput = {
   category_id?: string | null;
   category?: string;
   image_url: string;
+  gallery_image_urls?: string[];
   sku?: string;
   warranty?: string;
   stock_quantity: number;
@@ -25,6 +26,7 @@ type ProductRow = {
   price: number | string;
   category_id: string | null;
   image_url: string | null;
+  gallery_image_urls: string[] | null;
   sku: string | null;
   warranty: string | null;
   stock_quantity: number | null;
@@ -33,6 +35,11 @@ type ProductRow = {
   updated_at: string | null;
   categories?: { name: string } | { name: string }[] | null;
 };
+
+const productSelectFields =
+  'id,name,slug,description,price,category_id,image_url,gallery_image_urls,sku,warranty,stock_quantity,is_active,created_at,updated_at,categories(name)';
+const legacyProductSelectFields =
+  'id,name,slug,description,price,category_id,image_url,sku,warranty,stock_quantity,is_active,created_at,updated_at,categories(name)';
 
 interface ProductState {
   products: Product[];
@@ -69,6 +76,23 @@ function getCategoryName(row: ProductRow) {
   return category?.name || 'Accessories';
 }
 
+function cleanImageUrls(urls: (string | null | undefined)[] | null | undefined) {
+  const seen = new Set<string>();
+
+  return (urls || [])
+    .map((url) => (url || '').trim())
+    .filter(Boolean)
+    .filter((url) => {
+      if (seen.has(url)) return false;
+      seen.add(url);
+      return true;
+    });
+}
+
+function isMissingGalleryColumn(error: { message?: string } | null) {
+  return Boolean(error?.message?.toLowerCase().includes('gallery_image_urls'));
+}
+
 function mapProduct(row: ProductRow): Product {
   const stockQuantity = row.stock_quantity ?? 0;
   const price = Number(row.price);
@@ -82,6 +106,7 @@ function mapProduct(row: ProductRow): Product {
     category: getCategoryName(row),
     category_id: row.category_id,
     image_url: row.image_url || '',
+    gallery_image_urls: cleanImageUrls(row.gallery_image_urls),
     sku: row.sku || undefined,
     warranty: row.warranty || undefined,
     stock_quantity: stockQuantity,
@@ -100,6 +125,7 @@ function productToRow(product: ProductInput) {
     price: product.price,
     category_id: product.category_id || null,
     image_url: product.image_url.trim(),
+    gallery_image_urls: cleanImageUrls(product.gallery_image_urls),
     sku: product.sku?.trim() || null,
     warranty: product.warranty?.trim() || null,
     stock_quantity: product.stock_quantity,
@@ -131,14 +157,26 @@ export const useProductStore = create<ProductState>()((set, get) => ({
     set({ isLoading: true, error: null, isUsingFallback: false });
 
     try {
-      const [{ data: categoryData, error: categoryError }, { data: productData, error: productError }] = await Promise.all([
+      const [{ data: categoryData, error: categoryError }, productResult] = await Promise.all([
         supabase.from('categories').select('id,name,slug,created_at').order('name'),
         supabase
           .from('products')
-          .select('id,name,slug,description,price,category_id,image_url,sku,warranty,stock_quantity,is_active,created_at,updated_at,categories(name)')
+          .select(productSelectFields)
           .eq('is_active', true)
           .order('created_at', { ascending: false }),
       ]);
+      let productData = productResult.data as ProductRow[] | null;
+      let productError = productResult.error;
+
+      if (isMissingGalleryColumn(productError)) {
+        const retry = await supabase
+          .from('products')
+          .select(legacyProductSelectFields)
+          .eq('is_active', true)
+          .order('created_at', { ascending: false });
+        productData = retry.data as ProductRow[] | null;
+        productError = retry.error;
+      }
 
       if (categoryError || productError) {
         set({
@@ -187,13 +225,24 @@ export const useProductStore = create<ProductState>()((set, get) => ({
     set({ isLoading: true, error: null, isUsingFallback: false });
 
     try {
-      const [{ data: categoryData, error: categoryError }, { data: productData, error: productError }] = await Promise.all([
+      const [{ data: categoryData, error: categoryError }, productResult] = await Promise.all([
         supabase.from('categories').select('id,name,slug,created_at').order('name'),
         supabase
           .from('products')
-          .select('id,name,slug,description,price,category_id,image_url,sku,warranty,stock_quantity,is_active,created_at,updated_at,categories(name)')
+          .select(productSelectFields)
           .order('created_at', { ascending: false }),
       ]);
+      let productData = productResult.data as ProductRow[] | null;
+      let productError = productResult.error;
+
+      if (isMissingGalleryColumn(productError)) {
+        const retry = await supabase
+          .from('products')
+          .select(legacyProductSelectFields)
+          .order('created_at', { ascending: false });
+        productData = retry.data as ProductRow[] | null;
+        productError = retry.error;
+      }
 
       if (categoryError || productError) {
         set({
@@ -238,6 +287,7 @@ export const useProductStore = create<ProductState>()((set, get) => ({
         category: categoryName,
         category_id: product.category_id || categoryName,
         image_url: product.image_url,
+        gallery_image_urls: cleanImageUrls(product.gallery_image_urls),
         sku: product.sku,
         warranty: product.warranty,
         stock_quantity: product.stock_quantity,

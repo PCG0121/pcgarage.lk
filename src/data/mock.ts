@@ -8,6 +8,10 @@ export const mockProducts: Product[] = [
     price: 8500,
     category: 'Laptop Batteries',
     image_url: 'https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?auto=format&fit=crop&q=80&w=800',
+    gallery_image_urls: [
+      'https://images.unsplash.com/photo-1601737487795-dab272f52420?auto=format&fit=crop&q=80&w=800',
+      'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&q=80&w=800',
+    ],
     in_stock: true,
     created_at: new Date().toISOString(),
   },
@@ -18,6 +22,10 @@ export const mockProducts: Product[] = [
     price: 24500,
     category: 'Accessories',
     image_url: 'https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?auto=format&fit=crop&q=80&w=800',
+    gallery_image_urls: [
+      'https://images.unsplash.com/photo-1615663245857-ac93bb7c39e7?auto=format&fit=crop&q=80&w=800',
+      'https://images.unsplash.com/photo-1586816879360-004f5b0c51e3?auto=format&fit=crop&q=80&w=800',
+    ],
     in_stock: true,
     created_at: new Date().toISOString(),
   },
