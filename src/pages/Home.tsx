@@ -1255,16 +1255,16 @@ export function Home() {
           .electro-departments { display: none !important; }
           .electro-main-slide {
             min-height: 0 !important;
-            aspect-ratio: 3 / 4 !important;
+            aspect-ratio: 16 / 9 !important;
             background-color: var(--bg-card) !important;
           }
           .hero-slide-shade {
             background: linear-gradient(180deg, rgba(5,5,6,0.02), rgba(5,5,6,0.16));
           }
           .hero-carousel-controls {
-            left: 1.35rem !important;
-            right: 1.35rem !important;
-            bottom: 1rem !important;
+            left: 1rem !important;
+            right: 1rem !important;
+            bottom: 0.75rem !important;
           }
           .commerce-showcase { padding: 0 0.75rem 2.4rem; }
           .commerce-shell { gap: 0.85rem; }
