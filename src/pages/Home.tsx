@@ -1,5 +1,5 @@
 import {
-  ArrowRight, Battery, CheckCircle2, ChevronLeft, ChevronRight, Clock, Cpu, HardDrive,
+  ArrowRight, Battery, BatteryCharging, Camera, CheckCircle2, ChevronLeft, ChevronRight, Clock, Code2, Cpu, Droplet, HardDrive,
   Headphones, Heart, Keyboard, Laptop, Monitor, Plus, Printer, ShieldCheck, Star, Truck, Wrench, Zap
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -51,6 +51,11 @@ const categories = [
     color: '#f43f5e',
     imageUrl: '/category/printers.png',
   },
+  { name: 'Laptops', icon: Laptop, color: '#ffffff' },
+  { name: 'WiFi Camera', icon: Camera, color: '#ef4444' },
+  { name: 'Power bank', icon: BatteryCharging, color: '#ffffff' },
+  { name: 'Toner & Ink', icon: Droplet, color: '#f43f5e' },
+  { name: 'Software', icon: Code2, color: '#ffffff' },
   { name: 'Accessories', icon: Laptop, color: '#ffffff' },
 ];
 
@@ -61,23 +66,25 @@ const services = [
   { icon: Wrench, title: 'Thermal Cleaning', desc: 'Deep clean, paste replacement, and tune-ups.' },
 ];
 
+const desktopHeroSecurityImage = 'https://ik.imagekit.io/pcg/Website/hero/Untitled%20design%20(8).webp';
+const desktopKokoBanner = 'https://ik.imagekit.io/pcg/hero/mobile%20/banner/koko_banner.png';
+const desktopKokoSideBanner = 'https://ik.imagekit.io/pcg/hero/mobile%20/banner/ChatGPT%20Image%20Jun%209,%202026,%2001_06_47%20PM.webp';
+const mobileAfterHeroBanner = desktopKokoBanner;
+
 const heroSlides = [
   {
-    image: 'https://ik.imagekit.io/pcg/hero/hero1',
-    mobileImage: 'https://ik.imagekit.io/pcg/hero/mobile%20/Quality%20laptop%20parts%20pc%20garage',
+    image: desktopHeroSecurityImage,
+    mobileImage: desktopHeroSecurityImage,
     label: 'Laptop diagnostics',
   },
   {
-    image: 'https://ik.imagekit.io/pcg/Website/hero/Untitled%20design%20(8).webp',
-    mobileImage: 'https://ik.imagekit.io/pcg/hero/mobile%20/Untitled%20(1080%20x%201440%20px).webp',
+    image: desktopKokoSideBanner,
+    mobileImage: desktopKokoSideBanner,
     label: 'PC parts and accessories',
   },
 ];
 
 const heroFallbackImage = heroSlides[0].image;
-const mobileAfterHeroBanner = 'https://ik.imagekit.io/pcg/hero/mobile%20/banner/Untitled-design.jpg?updatedAt=1783346372011';
-const desktopKokoBanner = 'https://ik.imagekit.io/pcg/hero/mobile%20/banner/koko_banner.png';
-const desktopKokoSideBanner = 'https://ik.imagekit.io/pcg/hero/mobile%20/banner/ChatGPT%20Image%20Jun%209,%202026,%2001_06_47%20PM.webp';
 
 function Toast({ message, onClose }: { message: string; onClose: () => void }) {
   return (
@@ -394,6 +401,15 @@ export function Home() {
           </div>
         </div>
       </section>
+
+      <Link
+        to="/products"
+        className="mobile-after-hero-banner"
+        aria-label="Browse PC Garage payment offers"
+        style={{
+          backgroundImage: `url("${mobileAfterHeroBanner}")`,
+        }}
+      />
 
       <section className="commerce-showcase">
         <div className="commerce-shell">

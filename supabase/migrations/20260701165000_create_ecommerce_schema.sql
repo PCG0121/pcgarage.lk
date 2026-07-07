@@ -243,6 +243,11 @@ values
   ('RAM', 'ram'),
   ('Chargers', 'chargers'),
   ('Printers', 'printers'),
+  ('Laptops', 'laptops'),
+  ('WiFi Camera', 'wifi-camera'),
+  ('Power bank', 'power-bank'),
+  ('Toner & Ink', 'toner-ink'),
+  ('Software', 'software'),
   ('Accessories', 'accessories')
 on conflict (slug) do update set name = excluded.name;
 

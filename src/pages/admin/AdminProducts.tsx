@@ -41,7 +41,12 @@ function findCategoryIdByProductName(productName: string, categories: CategoryRe
     { category: 'SSD', keywords: ['ssd', 'nvme', 'm.2'] },
     { category: 'RAM', keywords: ['ram', 'memory', 'ddr'] },
     { category: 'Chargers', keywords: ['charger', 'adapter', 'power supply'] },
-    { category: 'Printers', keywords: ['printer', 'toner', 'ink'] },
+    { category: 'Laptops', keywords: ['laptop', 'notebook'] },
+    { category: 'WiFi Camera', keywords: ['wifi camera', 'wi-fi camera', 'camera', 'cctv', 'security camera', 'ezviz'] },
+    { category: 'Power bank', keywords: ['power bank', 'powerbank', 'portable charger'] },
+    { category: 'Toner & Ink', keywords: ['toner', 'ink', 'cartridge'] },
+    { category: 'Software', keywords: ['software', 'license', 'windows', 'office', 'antivirus'] },
+    { category: 'Printers', keywords: ['printer'] },
     { category: 'Accessories', keywords: ['mouse', 'cable', 'hub', 'adapter', 'accessory'] },
   ];
 

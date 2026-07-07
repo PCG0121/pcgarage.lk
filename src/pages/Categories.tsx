@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { useEffect, useMemo } from 'react';
 import { useProductStore } from '../store/productStore';
 import {
-  Laptop, Monitor, Keyboard, Battery, Zap, HardDrive, Cpu, Printer, ArrowRight, AlertCircle, LoaderCircle
+  Laptop, Monitor, Keyboard, Battery, Zap, HardDrive, Cpu, Printer, ArrowRight, AlertCircle, LoaderCircle, Camera, BatteryCharging, Droplet, Code2
 } from 'lucide-react';
 
 const categoryIcons: Record<string, any> = {
@@ -13,6 +13,11 @@ const categoryIcons: Record<string, any> = {
   'RAM': Cpu,
   'Chargers': Zap,
   'Printers': Printer,
+  'Laptops': Laptop,
+  'WiFi Camera': Camera,
+  'Power bank': BatteryCharging,
+  'Toner & Ink': Droplet,
+  'Software': Code2,
   'Accessories': Laptop,
 };
 
@@ -34,6 +39,11 @@ const categoryColors: Record<string, { bg: string; border: string; text: string;
   'RAM':              { bg: 'rgba(255,255,255,0.08)', border: 'rgba(255,255,255,0.20)', text: '#ffffff', glow: 'rgba(255,255,255,0.08)' },
   'Chargers':         { bg: 'rgba(239,68,68,0.14)', border: 'rgba(239,68,68,0.32)', text: '#ef4444', glow: 'rgba(239,68,68,0.12)' },
   'Printers':         { bg: 'rgba(244,63,94,0.14)', border: 'rgba(244,63,94,0.32)', text: '#f43f5e', glow: 'rgba(244,63,94,0.12)' },
+  'Laptops':          { bg: 'rgba(255,255,255,0.08)', border: 'rgba(255,255,255,0.20)', text: '#ffffff', glow: 'rgba(255,255,255,0.08)' },
+  'WiFi Camera':      { bg: 'rgba(239,68,68,0.14)', border: 'rgba(239,68,68,0.32)', text: '#ef4444', glow: 'rgba(239,68,68,0.12)' },
+  'Power bank':       { bg: 'rgba(255,255,255,0.08)', border: 'rgba(255,255,255,0.20)', text: '#ffffff', glow: 'rgba(255,255,255,0.08)' },
+  'Toner & Ink':      { bg: 'rgba(244,63,94,0.14)', border: 'rgba(244,63,94,0.32)', text: '#f43f5e', glow: 'rgba(244,63,94,0.12)' },
+  'Software':         { bg: 'rgba(255,255,255,0.08)', border: 'rgba(255,255,255,0.20)', text: '#ffffff', glow: 'rgba(255,255,255,0.08)' },
   'Accessories':      { bg: 'rgba(255,255,255,0.08)', border: 'rgba(255,255,255,0.20)', text: '#ffffff', glow: 'rgba(255,255,255,0.08)' },
 };
 

@@ -79,5 +79,10 @@ export const categories: Category[] = [
   'RAM',
   'Chargers',
   'Printers',
+  'Laptops',
+  'WiFi Camera',
+  'Power bank',
+  'Toner & Ink',
+  'Software',
   'Accessories',
 ];
