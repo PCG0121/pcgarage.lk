@@ -69,17 +69,19 @@ const services = [
 const desktopHeroSecurityImage = 'https://ik.imagekit.io/pcg/Website/hero/Untitled%20design%20(8).webp';
 const desktopKokoBanner = 'https://ik.imagekit.io/pcg/hero/mobile%20/banner/koko_banner.png';
 const desktopKokoSideBanner = 'https://ik.imagekit.io/pcg/hero/mobile%20/banner/ChatGPT%20Image%20Jun%209,%202026,%2001_06_47%20PM.webp';
+const mobileHeroLaptopImage = 'https://ik.imagekit.io/pcg/Website/hero/mobile%20/Quality%20laptop%20parts%20pc%20garage?updatedAt=1783423943541';
+const mobileHeroPartsImage = 'https://ik.imagekit.io/pcg/Website/hero/mobile%20/Untitled%20(1080%20x%201440%20px).webp?updatedAt=1783423943539';
 const mobileAfterHeroBanner = desktopKokoBanner;
 
 const heroSlides = [
   {
     image: desktopHeroSecurityImage,
-    mobileImage: desktopHeroSecurityImage,
+    mobileImage: mobileHeroLaptopImage,
     label: 'Laptop diagnostics',
   },
   {
     image: desktopKokoSideBanner,
-    mobileImage: desktopKokoSideBanner,
+    mobileImage: mobileHeroPartsImage,
     label: 'PC parts and accessories',
   },
 ];
@@ -1255,7 +1257,7 @@ export function Home() {
           .electro-departments { display: none !important; }
           .electro-main-slide {
             min-height: 0 !important;
-            aspect-ratio: 16 / 9 !important;
+            aspect-ratio: 3 / 4 !important;
             background-color: var(--bg-card) !important;
           }
           .hero-slide-shade {
