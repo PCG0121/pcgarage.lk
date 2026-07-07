@@ -302,7 +302,7 @@ export function ProductDetail() {
 
             {/* WhatsApp quick order */}
             <a
-              href={`https://wa.me/${import.meta.env.VITE_WHATSAPP_NUMBER || '94700000000'}?text=${encodeURIComponent(`Hi, I'd like to order: ${qty}x ${product.name} - Rs. ${(product.price * qty).toLocaleString()}`)}`}
+              href={`https://wa.me/${import.meta.env.VITE_WHATSAPP_NUMBER || '94711479191'}?text=${encodeURIComponent(`Hi, I'd like to order: ${qty}x ${product.name} - Rs. ${(product.price * qty).toLocaleString()}`)}`}
               target="_blank"
               rel="noopener noreferrer"
               style={{

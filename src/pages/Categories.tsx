@@ -205,7 +205,7 @@ export function Categories() {
                 Browse All Products <ArrowRight size={14} />
               </Link>
               <a
-                href={`https://wa.me/${import.meta.env.VITE_WHATSAPP_NUMBER || '94700000000'}`}
+                href={`https://wa.me/${import.meta.env.VITE_WHATSAPP_NUMBER || '94711479191'}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="btn-outline-glow"

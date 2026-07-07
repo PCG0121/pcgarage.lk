@@ -45,7 +45,7 @@ Update `.env.local` with your values:
 ```env
 VITE_SUPABASE_URL="https://your-project-ref.supabase.co"
 VITE_SUPABASE_ANON_KEY="your-anon-public-key"
-VITE_WHATSAPP_NUMBER="94700000000"
+VITE_WHATSAPP_NUMBER="94711479191"
 ```
 
 `VITE_WHATSAPP_NUMBER` must use country code format without `+`, spaces, or dashes. Example: `94771234567`.

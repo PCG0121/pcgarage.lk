@@ -187,7 +187,7 @@ export function Layout() {
             </p>
 
             <div className="footer-contact">
-              <a href="tel:+94700000000">+94 70 000 0000</a>
+              <a href="tel:+94711479191">0711479191</a>
               <a href="mailto:pcgarage012@gmail.com">pcgarage012@gmail.com</a>
             </div>
           </div>

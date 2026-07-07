@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState, type FormEvent } from 'react';
-import { Plus, Trash2, X, PackageCheck, Pencil, RefreshCcw } from 'lucide-react';
+import { Check, LoaderCircle, Plus, Search, SlidersHorizontal, Trash2, X, PackageCheck, Pencil, RefreshCcw } from 'lucide-react';
 import type { CategoryRecord, Product } from '../../types';
 import { useProductStore } from '../../store/productStore';
 
@@ -88,17 +88,35 @@ export function AdminProducts() {
   const [seoTitle, setSeoTitle] = useState('');
   const [metaDescription, setMetaDescription] = useState('');
   const [metaKeywords, setMetaKeywords] = useState('');
+  const [quantityDrafts, setQuantityDrafts] = useState<Record<string, string>>({});
+  const [savingQuantityId, setSavingQuantityId] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCategoryFilter, setSelectedCategoryFilter] = useState('All');
   const products = useProductStore((state) => state.products);
   const categories = useProductStore((state) => state.categories);
   const isUsingFallback = useProductStore((state) => state.isUsingFallback);
   const loadAdminProducts = useProductStore((state) => state.loadAdminProducts);
   const addProduct = useProductStore((state) => state.addProduct);
   const updateProduct = useProductStore((state) => state.updateProduct);
+  const updateProductQuantity = useProductStore((state) => state.updateProductQuantity);
   const deleteProduct = useProductStore((state) => state.deleteProduct);
 
   useEffect(() => {
     loadAdminProducts();
   }, [loadAdminProducts]);
+
+  useEffect(() => {
+    setQuantityDrafts((current) => {
+      const next: Record<string, string> = {};
+
+      products.forEach((product) => {
+        const quantity = product.stock_quantity ?? (product.in_stock ? 1 : 0);
+        next[product.id] = current[product.id] ?? String(quantity);
+      });
+
+      return next;
+    });
+  }, [products]);
 
   const resetFormState = () => {
     setProductName('');
@@ -137,6 +155,21 @@ export function AdminProducts() {
     if (!editingProduct) return categories[0]?.id || '';
     return editingProduct.category_id || categories.find((category) => category.name === editingProduct.category)?.id || '';
   }, [categories, editingProduct]);
+
+  const filteredProducts = useMemo(() => {
+    const query = searchQuery.trim().toLowerCase();
+
+    return products.filter((product) => {
+      const matchesSearch =
+        !query ||
+        [product.name, product.description, product.sku, product.slug]
+          .filter(Boolean)
+          .some((value) => String(value).toLowerCase().includes(query));
+      const matchesCategory = selectedCategoryFilter === 'All' || product.category === selectedCategoryFilter;
+
+      return matchesSearch && matchesCategory;
+    });
+  }, [products, searchQuery, selectedCategoryFilter]);
 
   useEffect(() => {
     if (isModalOpen) setCategoryId(selectedCategoryId);
@@ -218,6 +251,28 @@ export function AdminProducts() {
     }
   };
 
+  const handleQuantitySave = async (product: Product) => {
+    const currentQuantity = product.stock_quantity ?? (product.in_stock ? 1 : 0);
+    const nextQuantity = Math.max(0, Math.floor(Number(quantityDrafts[product.id] || 0)));
+
+    if (nextQuantity === currentQuantity) {
+      setQuantityDrafts((current) => ({ ...current, [product.id]: String(currentQuantity) }));
+      return;
+    }
+
+    try {
+      setFormError('');
+      setSavingQuantityId(product.id);
+      await updateProductQuantity(product.id, nextQuantity);
+      setQuantityDrafts((current) => ({ ...current, [product.id]: String(nextQuantity) }));
+    } catch (error) {
+      setQuantityDrafts((current) => ({ ...current, [product.id]: String(currentQuantity) }));
+      setFormError(error instanceof Error ? error.message : 'Could not update quantity.');
+    } finally {
+      setSavingQuantityId(null);
+    }
+  };
+
   return (
     <div>
       <div className="sm:flex sm:items-center sm:justify-between mb-8">
@@ -258,6 +313,43 @@ export function AdminProducts() {
         </div>
       )}
 
+      <div className="mb-4 rounded-2xl border border-zinc-200 bg-white p-4 shadow-sm">
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+          <div className="flex flex-1 flex-col gap-3 sm:flex-row">
+            <label className="relative flex-1">
+              <span className="sr-only">Search products</span>
+              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400" />
+              <input
+                type="search"
+                value={searchQuery}
+                onChange={(event) => setSearchQuery(event.currentTarget.value)}
+                placeholder="Search products, SKU, slug"
+                className="h-11 w-full rounded-xl border border-zinc-300 bg-white pl-10 pr-3 text-sm font-semibold text-zinc-900 placeholder:text-zinc-400 focus:border-rose-500 focus:outline-none focus:ring-1 focus:ring-rose-500"
+              />
+            </label>
+
+            <label className="relative sm:w-64">
+              <span className="sr-only">Filter by category</span>
+              <SlidersHorizontal className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400" />
+              <select
+                value={selectedCategoryFilter}
+                onChange={(event) => setSelectedCategoryFilter(event.currentTarget.value)}
+                className="h-11 w-full appearance-none rounded-xl border border-zinc-300 bg-white pl-10 pr-8 text-sm font-bold text-zinc-900 focus:border-rose-500 focus:outline-none focus:ring-1 focus:ring-rose-500"
+              >
+                <option value="All">All categories</option>
+                {categories.map((category) => (
+                  <option key={category.id} value={category.name}>{category.name}</option>
+                ))}
+              </select>
+            </label>
+          </div>
+
+          <div className="text-sm font-bold text-zinc-500">
+            Showing <span className="text-zinc-900">{filteredProducts.length}</span> of <span className="text-zinc-900">{products.length}</span>
+          </div>
+        </div>
+      </div>
+
       <div className="mt-8 flex flex-col">
         <div className="-my-2 -mx-4 overflow-x-auto sm:-mx-6 lg:-mx-8">
           <div className="inline-block min-w-full py-2 align-middle md:px-6 lg:px-8">
@@ -286,7 +378,7 @@ export function AdminProducts() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-zinc-200 bg-white">
-                  {products.map((product) => {
+                  {filteredProducts.map((product) => {
                     const quantity = product.stock_quantity ?? (product.in_stock ? 1 : 0);
 
                     return (
@@ -307,7 +399,38 @@ export function AdminProducts() {
                           {product.category}
                         </td>
                         <td className="whitespace-nowrap px-3 py-4 text-sm font-black text-zinc-900">
-                          {quantity}
+                          <div className="inline-flex items-center gap-2">
+                            <input
+                              aria-label={`Quantity for ${product.name}`}
+                              type="number"
+                              min="0"
+                              value={quantityDrafts[product.id] ?? String(quantity)}
+                              onChange={(event) => {
+                                const value = event.currentTarget.value;
+                                setQuantityDrafts((current) => ({ ...current, [product.id]: value }));
+                              }}
+                              onKeyDown={(event) => {
+                                if (event.key === 'Enter') {
+                                  event.preventDefault();
+                                  void handleQuantitySave(product);
+                                }
+                              }}
+                              className="h-9 w-20 rounded-lg border border-zinc-300 bg-white px-2 text-center text-sm font-black text-zinc-900 focus:border-rose-500 focus:outline-none focus:ring-1 focus:ring-rose-500"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => void handleQuantitySave(product)}
+                              disabled={savingQuantityId === product.id}
+                              className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-rose-600 text-white transition-colors hover:bg-rose-700 disabled:opacity-60"
+                              aria-label={`Save quantity for ${product.name}`}
+                            >
+                              {savingQuantityId === product.id ? (
+                                <LoaderCircle className="h-4 w-4 animate-spin" />
+                              ) : (
+                                <Check className="h-4 w-4" />
+                              )}
+                            </button>
+                          </div>
                         </td>
                         <td className="whitespace-nowrap px-3 py-4 text-sm text-zinc-500">
                           <span className={`inline-flex rounded-md px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${product.is_active === false ? 'bg-zinc-100 text-zinc-500' : quantity > 0 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-600'}`}>
@@ -340,6 +463,14 @@ export function AdminProducts() {
                       </tr>
                     );
                   })}
+                  {filteredProducts.length === 0 && (
+                    <tr>
+                      <td colSpan={6} className="px-6 py-12 text-center">
+                        <div className="text-sm font-black text-zinc-900">No products found</div>
+                        <div className="mt-1 text-xs font-semibold text-zinc-500">Try another search or category filter.</div>
+                      </td>
+                    </tr>
+                  )}
                 </tbody>
               </table>
             </div>

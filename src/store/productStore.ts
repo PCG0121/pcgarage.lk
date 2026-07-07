@@ -60,6 +60,7 @@ interface ProductState {
   loadAdminProducts: () => Promise<void>;
   addProduct: (product: ProductInput) => Promise<void>;
   updateProduct: (productId: string, product: ProductInput) => Promise<void>;
+  updateProductQuantity: (productId: string, quantity: number) => Promise<void>;
   deleteProduct: (productId: string) => Promise<void>;
   resetProducts: () => void;
 }
@@ -412,6 +413,30 @@ export const useProductStore = create<ProductState>()((set, get) => ({
       throw error;
     }
 
+    await get().loadAdminProducts();
+  },
+
+  updateProductQuantity: async (productId, quantity) => {
+    const stockQuantity = Math.max(0, Math.floor(quantity));
+
+    if (!supabase) {
+      set((state) => ({
+        products: state.products.map((existing) =>
+          existing.id === productId
+            ? {
+                ...existing,
+                stock_quantity: stockQuantity,
+                in_stock: stockQuantity > 0,
+                updated_at: new Date().toISOString(),
+              }
+            : existing
+        ),
+      }));
+      return;
+    }
+
+    const { error } = await supabase.from('products').update({ stock_quantity: stockQuantity }).eq('id', productId);
+    if (error) throw error;
     await get().loadAdminProducts();
   },
 

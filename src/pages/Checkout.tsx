@@ -58,7 +58,7 @@ export function Checkout() {
         .join('\n');
       const totalStr = `Rs. ${cartTotal.toLocaleString()}`;
       const message = `*New Order - PC Garage*\n\n*Customer:*\nName: ${formData.name}\nPhone: ${formData.phone}\nAddress: ${formData.address}, ${formData.city}\n\n*Items:*\n${orderItemLines}\n\n*Total: ${totalStr}*`;
-      const waNumber = import.meta.env.VITE_WHATSAPP_NUMBER || '94700000000';
+      const waNumber = import.meta.env.VITE_WHATSAPP_NUMBER || '94711479191';
 
       clearCart();
       window.location.href = `https://wa.me/${waNumber}?text=${encodeURIComponent(message)}`;
