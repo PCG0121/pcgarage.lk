@@ -42,10 +42,9 @@ type ProductRow = {
   categories?: { name: string } | { name: string }[] | null;
 };
 
-const productSelectFields =
-  'id,name,slug,description,price,category_id,image_url,gallery_image_urls,sku,warranty,seo_title,meta_description,meta_keywords,stock_quantity,is_active,created_at,updated_at,categories(name)';
 const noSeoProductSelectFields =
   'id,name,slug,description,price,category_id,image_url,gallery_image_urls,sku,warranty,stock_quantity,is_active,created_at,updated_at,categories(name)';
+const productSelectFields = noSeoProductSelectFields;
 const legacyProductSelectFields =
   'id,name,slug,description,price,category_id,image_url,sku,warranty,stock_quantity,is_active,created_at,updated_at,categories(name)';
 
