@@ -35,6 +35,7 @@ export function ProductDetail() {
   const [toast, setToast] = useState(false);
   const [qty, setQty] = useState(1);
   const [selectedImage, setSelectedImage] = useState('');
+  const [activeDetailTab, setActiveDetailTab] = useState<'description' | 'additional'>('description');
 
   useEffect(() => {
     loadProducts();
@@ -43,6 +44,32 @@ export function ProductDetail() {
   useEffect(() => {
     setSelectedImage(product?.image_url || '');
   }, [product?.id, product?.image_url]);
+
+  useEffect(() => {
+    if (!product) return;
+
+    const title = product.seo_title?.trim() || `${product.name} | PC Garage Sri Lanka`;
+    const description = product.meta_description?.trim() || product.description;
+    document.title = title;
+
+    let metaDescription = document.querySelector<HTMLMetaElement>('meta[name="description"]');
+    if (!metaDescription) {
+      metaDescription = document.createElement('meta');
+      metaDescription.name = 'description';
+      document.head.appendChild(metaDescription);
+    }
+    metaDescription.content = description.slice(0, 160);
+
+    if (product.meta_keywords?.trim()) {
+      let metaKeywords = document.querySelector<HTMLMetaElement>('meta[name="keywords"]');
+      if (!metaKeywords) {
+        metaKeywords = document.createElement('meta');
+        metaKeywords.name = 'keywords';
+        document.head.appendChild(metaKeywords);
+      }
+      metaKeywords.content = product.meta_keywords.trim();
+    }
+  }, [product]);
 
   if ((isLoading || !hasLoaded) && !product) {
     return (
@@ -85,6 +112,10 @@ export function ProductDetail() {
     { label: 'Stock quantity', value: product.stock_quantity !== undefined ? String(product.stock_quantity) : undefined },
     { label: 'Warranty', value: product.warranty },
   ].filter((item) => item.value);
+  const descriptionBlocks = product.description
+    .split(/\n{2,}/)
+    .map((block) => block.trim())
+    .filter(Boolean);
 
   const handleAddToCart = () => {
     addItem(product, qty);
@@ -293,60 +324,46 @@ export function ProductDetail() {
         </div>
 
         {/* Product Details */}
-        <section
-          style={{
-            marginTop: '3rem',
-            borderTop: '1px solid var(--border-subtle)',
-            paddingTop: '2rem',
-          }}
-        >
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'minmax(0, 1fr) minmax(280px, 0.45fr)',
-              gap: '2.5rem',
-              alignItems: 'start',
-            }}
-            className="product-details-grid"
-          >
-            <div>
-              <div className="section-label" style={{ marginBottom: '0.6rem' }}>Product Details</div>
-              <h2 style={{ fontSize: '1.5rem', fontWeight: 900, color: 'var(--text-primary)', letterSpacing: '-0.03em', margin: '0 0 1rem' }}>
-                Description
-              </h2>
-              <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', lineHeight: 1.85, margin: 0, maxWidth: '58rem' }}>
-                {product.description}
-              </p>
-            </div>
+        <section className="woocommerce-product-panel">
+          <div className="product-tabs" role="tablist" aria-label="Product information">
+            {[
+              { id: 'description', label: 'Description' },
+              { id: 'additional', label: 'Additional information' },
+            ].map((tab) => (
+              <button
+                key={tab.id}
+                type="button"
+                role="tab"
+                aria-selected={activeDetailTab === tab.id}
+                className={`product-tab ${activeDetailTab === tab.id ? 'active' : ''}`}
+                onClick={() => setActiveDetailTab(tab.id as 'description' | 'additional')}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
 
-            <div
-              style={{
-                border: '1px solid var(--border-subtle)',
-                borderRadius: '0.875rem',
-                overflow: 'hidden',
-                background: 'var(--bg-card)',
-              }}
-            >
-              {productFacts.map((item, index) => (
-                <div
-                  key={item.label}
-                  style={{
-                    display: 'grid',
-                    gridTemplateColumns: '0.9fr 1.1fr',
-                    gap: '1rem',
-                    padding: '0.9rem 1rem',
-                    borderTop: index === 0 ? 'none' : '1px solid var(--border-subtle)',
-                  }}
-                >
-                  <div style={{ color: 'var(--text-muted)', fontSize: '0.78rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
-                    {item.label}
-                  </div>
-                  <div style={{ color: 'var(--text-primary)', fontSize: '0.88rem', fontWeight: 700, textAlign: 'right' }}>
-                    {item.value}
-                  </div>
+          <div className="product-tab-content">
+            {activeDetailTab === 'description' ? (
+              <div className="product-description-copy">
+                <h2>Description</h2>
+                {(descriptionBlocks.length > 0 ? descriptionBlocks : ['Product details will be updated soon.']).map((block) => (
+                  <p key={block}>{block}</p>
+                ))}
+              </div>
+            ) : (
+              <div className="product-additional-info">
+                <h2>Additional information</h2>
+                <div className="product-info-table">
+                  {productFacts.map((item) => (
+                    <div key={item.label} className="product-info-row">
+                      <div>{item.label}</div>
+                      <div>{item.value}</div>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
+              </div>
+            )}
           </div>
         </section>
 
@@ -395,11 +412,92 @@ export function ProductDetail() {
       <style>{`
         @media (max-width: 768px) {
           .detail-grid { grid-template-columns: 1fr !important; gap: 1.6rem !important; }
-          .product-details-grid { grid-template-columns: 1fr !important; gap: 1.5rem !important; }
           .detail-grid > div:first-child { border-radius: 1rem !important; }
           .product-purchase-row { flex-direction: column !important; align-items: stretch !important; }
           .product-purchase-row > div,
           .product-purchase-row > button { width: 100% !important; }
+          .product-tabs { overflow-x: auto; }
+          .product-tab { white-space: nowrap; }
+        }
+        .woocommerce-product-panel {
+          margin-top: 3rem;
+          border: 1px solid var(--border-subtle);
+          border-radius: 1rem;
+          background: var(--bg-card);
+          overflow: hidden;
+          box-shadow: var(--shadow-card);
+        }
+        .product-tabs {
+          display: flex;
+          gap: 0;
+          border-bottom: 1px solid var(--border-subtle);
+          background: #0c0c0e;
+        }
+        .product-tab {
+          min-height: 3.35rem;
+          padding: 0 1.35rem;
+          border: 0;
+          border-right: 1px solid var(--border-subtle);
+          background: transparent;
+          color: var(--text-muted);
+          cursor: pointer;
+          font-size: 0.82rem;
+          font-weight: 900;
+          text-transform: uppercase;
+          letter-spacing: 0.04em;
+        }
+        .product-tab.active {
+          background: var(--bg-card);
+          color: #ffffff;
+          box-shadow: inset 0 3px 0 #ef4444;
+        }
+        .product-tab-content {
+          padding: clamp(1.25rem, 3vw, 2rem);
+        }
+        .product-description-copy h2,
+        .product-additional-info h2 {
+          margin: 0 0 1rem;
+          color: #ffffff;
+          font-size: 1.35rem;
+          font-weight: 900;
+          letter-spacing: -0.02em;
+        }
+        .product-description-copy p {
+          max-width: 68rem;
+          margin: 0;
+          color: var(--text-secondary);
+          font-size: 0.95rem;
+          line-height: 1.9;
+        }
+        .product-description-copy p + p {
+          margin-top: 1rem;
+        }
+        .product-info-table {
+          border: 1px solid var(--border-subtle);
+          border-radius: 0.75rem;
+          overflow: hidden;
+        }
+        .product-info-row {
+          display: grid;
+          grid-template-columns: minmax(9rem, 0.38fr) minmax(0, 1fr);
+          border-top: 1px solid var(--border-subtle);
+        }
+        .product-info-row:first-child {
+          border-top: 0;
+        }
+        .product-info-row > div {
+          padding: 0.95rem 1rem;
+          color: var(--text-secondary);
+          font-size: 0.88rem;
+          font-weight: 700;
+        }
+        .product-info-row > div:first-child {
+          background: rgba(255,255,255,0.035);
+          color: var(--text-muted);
+          font-size: 0.76rem;
+          font-weight: 900;
+          text-transform: uppercase;
+          letter-spacing: 0.06em;
         }
         .detail-img:hover { opacity: 1 !important; transform: scale(1.04); }
         .back-btn:hover { color: var(--text-primary) !important; }

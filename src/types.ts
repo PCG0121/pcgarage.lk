@@ -21,6 +21,9 @@ export interface Product {
   stock_quantity?: number;
   sku?: string;
   warranty?: string;
+  seo_title?: string;
+  meta_description?: string;
+  meta_keywords?: string;
   is_active?: boolean;
   created_at: string;
   updated_at?: string;

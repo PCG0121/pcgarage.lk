@@ -297,7 +297,7 @@ export function ProductList() {
             gap: 0.55rem !important;
           }
         }
-        select option { background: #111113; color: #ffffff; }
+        select option { background: var(--field-bg); color: var(--text-primary); }
       `}</style>
     </div>
   );

@@ -14,6 +14,9 @@ type ProductInput = {
   gallery_image_urls?: string[];
   sku?: string;
   warranty?: string;
+  seo_title?: string;
+  meta_description?: string;
+  meta_keywords?: string;
   stock_quantity: number;
   is_active?: boolean;
 };
@@ -29,6 +32,9 @@ type ProductRow = {
   gallery_image_urls: string[] | null;
   sku: string | null;
   warranty: string | null;
+  seo_title: string | null;
+  meta_description: string | null;
+  meta_keywords: string | null;
   stock_quantity: number | null;
   is_active: boolean | null;
   created_at: string;
@@ -37,6 +43,8 @@ type ProductRow = {
 };
 
 const productSelectFields =
+  'id,name,slug,description,price,category_id,image_url,gallery_image_urls,sku,warranty,seo_title,meta_description,meta_keywords,stock_quantity,is_active,created_at,updated_at,categories(name)';
+const noSeoProductSelectFields =
   'id,name,slug,description,price,category_id,image_url,gallery_image_urls,sku,warranty,stock_quantity,is_active,created_at,updated_at,categories(name)';
 const legacyProductSelectFields =
   'id,name,slug,description,price,category_id,image_url,sku,warranty,stock_quantity,is_active,created_at,updated_at,categories(name)';
@@ -93,6 +101,11 @@ function isMissingGalleryColumn(error: { message?: string } | null) {
   return Boolean(error?.message?.toLowerCase().includes('gallery_image_urls'));
 }
 
+function isMissingSeoColumn(error: { message?: string } | null) {
+  const message = error?.message?.toLowerCase() || '';
+  return ['seo_title', 'meta_description', 'meta_keywords'].some((column) => message.includes(column));
+}
+
 function mapProduct(row: ProductRow): Product {
   const stockQuantity = row.stock_quantity ?? 0;
   const price = Number(row.price);
@@ -109,6 +122,9 @@ function mapProduct(row: ProductRow): Product {
     gallery_image_urls: cleanImageUrls(row.gallery_image_urls),
     sku: row.sku || undefined,
     warranty: row.warranty || undefined,
+    seo_title: row.seo_title || undefined,
+    meta_description: row.meta_description || undefined,
+    meta_keywords: row.meta_keywords || undefined,
     stock_quantity: stockQuantity,
     in_stock: stockQuantity > 0,
     is_active: row.is_active ?? true,
@@ -128,13 +144,27 @@ function productToRow(product: ProductInput) {
     gallery_image_urls: cleanImageUrls(product.gallery_image_urls),
     sku: product.sku?.trim() || null,
     warranty: product.warranty?.trim() || null,
+    seo_title: product.seo_title?.trim() || null,
+    meta_description: product.meta_description?.trim() || null,
+    meta_keywords: product.meta_keywords?.trim() || null,
     stock_quantity: product.stock_quantity,
     is_active: product.is_active ?? true,
   };
 }
 
+function productToNoSeoRow(product: ProductInput) {
+  const { seo_title: _seoTitle, meta_description: _metaDescription, meta_keywords: _metaKeywords, ...row } = productToRow(product);
+  return row;
+}
+
 function productToLegacyRow(product: ProductInput) {
-  const { gallery_image_urls: _galleryImageUrls, ...row } = productToRow(product);
+  const {
+    gallery_image_urls: _galleryImageUrls,
+    seo_title: _seoTitle,
+    meta_description: _metaDescription,
+    meta_keywords: _metaKeywords,
+    ...row
+  } = productToRow(product);
   return row;
 }
 
@@ -172,6 +202,16 @@ export const useProductStore = create<ProductState>()((set, get) => ({
       ]);
       let productData = productResult.data as ProductRow[] | null;
       let productError = productResult.error;
+
+      if (isMissingSeoColumn(productError)) {
+        const retry = await supabase
+          .from('products')
+          .select(noSeoProductSelectFields)
+          .eq('is_active', true)
+          .order('created_at', { ascending: false });
+        productData = retry.data as ProductRow[] | null;
+        productError = retry.error;
+      }
 
       if (isMissingGalleryColumn(productError)) {
         const retry = await supabase
@@ -240,6 +280,15 @@ export const useProductStore = create<ProductState>()((set, get) => ({
       let productData = productResult.data as ProductRow[] | null;
       let productError = productResult.error;
 
+      if (isMissingSeoColumn(productError)) {
+        const retry = await supabase
+          .from('products')
+          .select(noSeoProductSelectFields)
+          .order('created_at', { ascending: false });
+        productData = retry.data as ProductRow[] | null;
+        productError = retry.error;
+      }
+
       if (isMissingGalleryColumn(productError)) {
         const retry = await supabase
           .from('products')
@@ -295,6 +344,9 @@ export const useProductStore = create<ProductState>()((set, get) => ({
         gallery_image_urls: cleanImageUrls(product.gallery_image_urls),
         sku: product.sku,
         warranty: product.warranty,
+        seo_title: product.seo_title,
+        meta_description: product.meta_description,
+        meta_keywords: product.meta_keywords,
         stock_quantity: product.stock_quantity,
         in_stock: product.stock_quantity > 0,
         is_active: product.is_active ?? true,
@@ -306,7 +358,15 @@ export const useProductStore = create<ProductState>()((set, get) => ({
 
     const { error } = await supabase.from('products').insert(productToRow(product));
 
-    if (isMissingGalleryColumn(error)) {
+    if (isMissingSeoColumn(error)) {
+      const retry = await supabase.from('products').insert(productToNoSeoRow(product));
+      if (isMissingGalleryColumn(retry.error)) {
+        const legacyRetry = await supabase.from('products').insert(productToLegacyRow(product));
+        if (legacyRetry.error) throw legacyRetry.error;
+      } else if (retry.error) {
+        throw retry.error;
+      }
+    } else if (isMissingGalleryColumn(error)) {
       const retry = await supabase.from('products').insert(productToLegacyRow(product));
       if (retry.error) throw retry.error;
     } else if (error) {
@@ -337,7 +397,15 @@ export const useProductStore = create<ProductState>()((set, get) => ({
 
     const { error } = await supabase.from('products').update(productToRow(product)).eq('id', productId);
 
-    if (isMissingGalleryColumn(error)) {
+    if (isMissingSeoColumn(error)) {
+      const retry = await supabase.from('products').update(productToNoSeoRow(product)).eq('id', productId);
+      if (isMissingGalleryColumn(retry.error)) {
+        const legacyRetry = await supabase.from('products').update(productToLegacyRow(product)).eq('id', productId);
+        if (legacyRetry.error) throw legacyRetry.error;
+      } else if (retry.error) {
+        throw retry.error;
+      }
+    } else if (isMissingGalleryColumn(error)) {
       const retry = await supabase.from('products').update(productToLegacyRow(product)).eq('id', productId);
       if (retry.error) throw retry.error;
     } else if (error) {

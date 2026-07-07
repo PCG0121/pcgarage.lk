@@ -68,7 +68,7 @@ const heroSlides = [
     label: 'Laptop diagnostics',
   },
   {
-    image: 'https://ik.imagekit.io/pcg/hero/mobile%20/Untitled%20(1080%20x%201440%20px).webp',
+    image: 'https://ik.imagekit.io/pcg/Website/hero/Untitled%20design%20(8).webp',
     mobileImage: 'https://ik.imagekit.io/pcg/hero/mobile%20/Untitled%20(1080%20x%201440%20px).webp',
     label: 'PC parts and accessories',
   },
@@ -291,7 +291,7 @@ export function Home() {
         style={{
           padding: '1.5rem',
           borderBottom: '1px solid var(--border-subtle)',
-          background: '#060607',
+          background: 'var(--bg-base)',
           position: 'relative',
         }}
       >
@@ -332,12 +332,13 @@ export function Home() {
             <div
               className="electro-main-slide"
               style={{
-                minHeight: '32rem',
+                minHeight: 0,
+                aspectRatio: '16 / 9',
                 borderRadius: '0.9rem',
                 border: '1px solid var(--border-subtle)',
                 overflow: 'hidden',
                 position: 'relative',
-                backgroundColor: '#060607',
+                backgroundColor: 'var(--bg-card)',
               }}
             >
               {previousHeroImage && (
@@ -672,7 +673,7 @@ export function Home() {
         }
         .commerce-showcase {
           padding: 1rem 1.5rem 4rem;
-          background: #050506;
+          background: var(--bg-base);
         }
         .commerce-shell {
           width: 100%;
@@ -687,7 +688,7 @@ export function Home() {
           border-radius: 1.1rem;
           background:
             radial-gradient(circle at 18% 0%, rgba(255,255,255,0.07), transparent 34%),
-            linear-gradient(145deg, #121215, #080809);
+            var(--bg-surface);
           box-shadow: var(--shadow-card);
           overflow: hidden;
         }
@@ -704,7 +705,7 @@ export function Home() {
         }
         .commerce-section-head h2 {
           margin: 0;
-          color: #ffffff;
+          color: var(--text-primary);
           font-size: 1.18rem;
           line-height: 1.2;
           font-weight: 900;
@@ -742,12 +743,12 @@ export function Home() {
         .top-category-card {
           min-height: 10.2rem;
           padding: 0.85rem;
-          border: 1px solid rgba(255,255,255,0.10);
+          border: 1px solid var(--border-subtle);
           border-radius: 1rem;
           background:
             radial-gradient(circle at 50% 16%, rgba(255,255,255,0.10), transparent 42%),
-            #171719;
-          color: #ffffff;
+            var(--bg-card);
+          color: var(--text-primary);
           text-decoration: none;
           display: flex;
           flex-direction: column;
@@ -760,7 +761,7 @@ export function Home() {
           border-color: rgba(239,68,68,0.42);
           background:
             radial-gradient(circle at 50% 16%, rgba(239,68,68,0.18), transparent 42%),
-            #1a1a1d;
+            var(--bg-elevated);
         }
         .top-category-media {
           height: 6.7rem;
@@ -776,7 +777,7 @@ export function Home() {
           filter: drop-shadow(0 16px 18px rgba(0,0,0,0.42));
         }
         .top-category-card span {
-          color: #ffffff;
+          color: var(--text-primary);
           font-size: 0.8rem;
           line-height: 1.25;
           font-weight: 800;
@@ -784,11 +785,11 @@ export function Home() {
         .best-seller-card {
           position: relative;
           min-height: 16.9rem;
-          border: 1px solid rgba(255,255,255,0.10);
+          border: 1px solid var(--border-subtle);
           border-radius: 1rem;
           background:
             radial-gradient(circle at 50% 10%, rgba(255,255,255,0.08), transparent 40%),
-            #171719;
+            var(--bg-card);
           overflow: hidden;
           box-shadow: 0 16px 34px rgba(0,0,0,0.28);
           scroll-snap-align: start;
@@ -831,7 +832,7 @@ export function Home() {
           -webkit-line-clamp: 2;
           -webkit-box-orient: vertical;
           overflow: hidden;
-          color: #ffffff;
+          color: var(--text-primary);
           text-decoration: none;
           font-size: 0.76rem;
           line-height: 1.35;
@@ -839,7 +840,7 @@ export function Home() {
         }
         .best-seller-price {
           margin-top: 0.35rem;
-          color: #ffffff;
+          color: var(--text-primary);
           font-size: 0.92rem;
           font-weight: 900;
         }
@@ -977,11 +978,11 @@ export function Home() {
         .store-product-card {
           position: relative;
           min-width: 0;
-          border: 1px solid rgba(255,255,255,0.10);
+          border: 1px solid var(--border-subtle);
           border-radius: 1rem;
           background:
             radial-gradient(circle at 50% 0%, rgba(255,255,255,0.07), transparent 34%),
-            #161619;
+            var(--bg-card);
           overflow: hidden;
           box-shadow: 0 14px 30px rgba(0,0,0,0.24);
           transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
@@ -1000,7 +1001,7 @@ export function Home() {
           padding: 1rem;
           background:
             linear-gradient(145deg, rgba(255,255,255,0.04), rgba(0,0,0,0.14)),
-            #111113;
+            var(--bg-elevated);
           text-decoration: none;
         }
         .store-product-image img {
@@ -1064,7 +1065,7 @@ export function Home() {
           -webkit-line-clamp: 2;
           -webkit-box-orient: vertical;
           overflow: hidden;
-          color: #ffffff;
+          color: var(--text-primary);
           text-decoration: none;
           font-size: 0.88rem;
           line-height: 1.38;
@@ -1092,7 +1093,7 @@ export function Home() {
         }
         .store-product-footer strong {
           min-width: 0;
-          color: #ffffff;
+          color: var(--text-primary);
           font-size: 1rem;
           font-weight: 950;
           white-space: nowrap;
@@ -1121,7 +1122,7 @@ export function Home() {
           border-radius: 1rem;
           background:
             radial-gradient(circle at 0% 0%, rgba(255,255,255,0.06), transparent 30%),
-            #101012;
+            var(--bg-card);
           display: grid;
           grid-template-columns: repeat(3, minmax(0, 1fr));
           gap: 0.5rem;
@@ -1143,7 +1144,7 @@ export function Home() {
           display: block;
         }
         .service-info-item strong {
-          color: #ffffff;
+          color: var(--text-primary);
           font-size: 0.88rem;
           font-weight: 900;
         }
@@ -1157,7 +1158,7 @@ export function Home() {
           width: 100%;
           height: 100%;
           display: block;
-          object-fit: cover;
+          object-fit: contain;
           object-position: center;
           will-change: opacity, transform;
         }
@@ -1227,7 +1228,7 @@ export function Home() {
             margin: 0.25rem auto 1rem;
             border: 1px solid var(--border-subtle);
             border-radius: 0.9rem;
-            background-color: #111113;
+            background-color: var(--bg-card);
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
@@ -1239,10 +1240,7 @@ export function Home() {
           .electro-main-slide {
             min-height: 0 !important;
             aspect-ratio: 3 / 4 !important;
-            background-color: #060607 !important;
-          }
-          .hero-slide-img {
-            object-fit: contain;
+            background-color: var(--bg-card) !important;
           }
           .hero-slide-shade {
             background: linear-gradient(180deg, rgba(5,5,6,0.02), rgba(5,5,6,0.16));
@@ -1336,14 +1334,15 @@ export function Home() {
           .store-stock-badge { left: 0.52rem; }
           .store-sale-badge { right: 0.52rem; }
           .store-product-body {
-            padding: 0.68rem;
+            padding: 0.72rem;
           }
           .store-product-category {
             font-size: 0.55rem;
           }
           .store-product-title {
-            min-height: 2.2rem;
-            font-size: 0.72rem;
+            min-height: 2.55rem;
+            font-size: 0.74rem;
+            line-height: 1.35;
           }
           .store-product-rating {
             margin-top: 0.42rem;

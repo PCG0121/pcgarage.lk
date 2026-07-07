@@ -65,6 +65,10 @@ function getProductSaveError(error: unknown) {
     return 'Gallery images need the latest Supabase migration. Run the add_product_gallery_images migration in Supabase, then try again.';
   }
 
+  if (normalized.includes('seo_title') || normalized.includes('meta_description') || normalized.includes('meta_keywords')) {
+    return 'SEO details need the latest Supabase migration. Run the add_product_seo_fields migration in Supabase, then try again.';
+  }
+
   if (normalized.includes('duplicate key') || normalized.includes('products_slug_key')) {
     return 'A product with this slug already exists. Change the slug or product name and try again.';
   }
@@ -78,6 +82,12 @@ export function AdminProducts() {
   const [formError, setFormError] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const [categoryId, setCategoryId] = useState('');
+  const [productName, setProductName] = useState('');
+  const [slugValue, setSlugValue] = useState('');
+  const [isSlugManuallyEdited, setIsSlugManuallyEdited] = useState(false);
+  const [seoTitle, setSeoTitle] = useState('');
+  const [metaDescription, setMetaDescription] = useState('');
+  const [metaKeywords, setMetaKeywords] = useState('');
   const products = useProductStore((state) => state.products);
   const categories = useProductStore((state) => state.categories);
   const isUsingFallback = useProductStore((state) => state.isUsingFallback);
@@ -90,19 +100,36 @@ export function AdminProducts() {
     loadAdminProducts();
   }, [loadAdminProducts]);
 
+  const resetFormState = () => {
+    setProductName('');
+    setSlugValue('');
+    setIsSlugManuallyEdited(false);
+    setSeoTitle('');
+    setMetaDescription('');
+    setMetaKeywords('');
+  };
+
   const closeModal = () => {
     setIsModalOpen(false);
     setEditingProduct(null);
     setFormError('');
+    resetFormState();
   };
 
   const openAddModal = () => {
     setEditingProduct(null);
+    resetFormState();
     setIsModalOpen(true);
   };
 
   const openEditModal = (product: Product) => {
     setEditingProduct(product);
+    setProductName(product.name);
+    setSlugValue(product.slug || slugify(product.name));
+    setIsSlugManuallyEdited(Boolean(product.slug && product.slug !== slugify(product.name)));
+    setSeoTitle(product.seo_title || '');
+    setMetaDescription(product.meta_description || '');
+    setMetaKeywords(product.meta_keywords || '');
     setIsModalOpen(true);
   };
 
@@ -116,8 +143,19 @@ export function AdminProducts() {
   }, [isModalOpen, selectedCategoryId]);
 
   const handleProductNameChange = (value: string) => {
+    setProductName(value);
+
+    if (!isSlugManuallyEdited) {
+      setSlugValue(slugify(value));
+    }
+
     const matchedCategoryId = findCategoryIdByProductName(value, categories);
     if (matchedCategoryId) setCategoryId(matchedCategoryId);
+  };
+
+  const handleSlugChange = (value: string) => {
+    setSlugValue(slugify(value));
+    setIsSlugManuallyEdited(true);
   };
 
   const handleSaveProduct = async (event: FormEvent<HTMLFormElement>) => {
@@ -145,6 +183,9 @@ export function AdminProducts() {
         stock_quantity: stockQuantity,
         sku: String(formData.get('sku') || '').trim(),
         warranty: String(formData.get('warranty') || '').trim(),
+        seo_title: seoTitle.trim(),
+        meta_description: metaDescription.trim(),
+        meta_keywords: metaKeywords.trim(),
         image_url: imageUrl,
         gallery_image_urls: galleryImageUrls,
         description: description || 'Product details will be updated soon.',
@@ -325,12 +366,29 @@ export function AdminProducts() {
                   <div className="grid gap-4 sm:grid-cols-2">
                     <div className="sm:col-span-2">
                       <label className="block text-sm font-bold text-zinc-900 mb-1">Product Name</label>
-                      <input name="name" defaultValue={editingProduct?.name || ''} onChange={(event) => handleProductNameChange(event.currentTarget.value)} required type="text" placeholder="Example: Samsung 980 PRO 1TB SSD" className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:border-rose-500 focus:outline-none focus:ring-1 focus:ring-rose-500" />
+                      <input name="name" value={productName} onChange={(event) => handleProductNameChange(event.currentTarget.value)} required type="text" placeholder="Example: Samsung 980 PRO 1TB SSD" className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:border-rose-500 focus:outline-none focus:ring-1 focus:ring-rose-500" />
                     </div>
 
                     <div className="sm:col-span-2">
-                      <label className="block text-sm font-bold text-zinc-900 mb-1">Slug</label>
-                      <input name="slug" defaultValue={editingProduct?.slug || ''} type="text" placeholder="Auto-generated from name if empty" className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:border-rose-500 focus:outline-none focus:ring-1 focus:ring-rose-500" />
+                      <div className="mb-1 flex items-center justify-between gap-3">
+                        <label className="block text-sm font-bold text-zinc-900">Slug</label>
+                        {isSlugManuallyEdited && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setSlugValue(slugify(productName));
+                              setIsSlugManuallyEdited(false);
+                            }}
+                            className="text-xs font-bold text-rose-600 hover:text-rose-700"
+                          >
+                            Auto-generate
+                          </button>
+                        )}
+                      </div>
+                      <input name="slug" value={slugValue} onChange={(event) => handleSlugChange(event.currentTarget.value)} type="text" placeholder="Auto-generated from product name" className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:border-rose-500 focus:outline-none focus:ring-1 focus:ring-rose-500" />
+                      <p className="mt-1 text-xs font-medium text-zinc-500">
+                        Product URL: /product/{slugValue || 'product-slug'}
+                      </p>
                     </div>
 
                     <div>
@@ -379,6 +437,59 @@ export function AdminProducts() {
                         placeholder="Add product specs, compatibility, condition, warranty details, and anything customers should know."
                         className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:border-rose-500 focus:outline-none focus:ring-1 focus:ring-rose-500"
                       />
+                    </div>
+
+                    <div className="sm:col-span-2 rounded-xl border border-zinc-200 bg-zinc-50 p-4">
+                      <div className="mb-4 flex items-start justify-between gap-4">
+                        <div>
+                          <h3 className="text-sm font-black uppercase tracking-wide text-zinc-900">SEO Details</h3>
+                          <p className="mt-1 text-xs font-medium text-zinc-500">Search result title, meta description, and keywords for this product.</p>
+                        </div>
+                        <span className="rounded-md bg-rose-100 px-2 py-1 text-[10px] font-black uppercase tracking-wider text-rose-700">SEO</span>
+                      </div>
+
+                      <div className="space-y-3">
+                        <div>
+                          <label className="mb-1 flex items-center justify-between gap-3 text-sm font-bold text-zinc-900">
+                            SEO Title
+                            <span className="text-xs font-bold text-zinc-400">{(seoTitle || productName).length}/60</span>
+                          </label>
+                          <input name="seo_title" value={seoTitle} onChange={(event) => setSeoTitle(event.currentTarget.value)} type="text" maxLength={70} placeholder={productName || 'Example: Samsung 980 PRO 1TB SSD in Sri Lanka'} className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:border-rose-500 focus:outline-none focus:ring-1 focus:ring-rose-500" />
+                        </div>
+
+                        <div>
+                          <label className="mb-1 flex items-center justify-between gap-3 text-sm font-bold text-zinc-900">
+                            Meta Description
+                            <span className="text-xs font-bold text-zinc-400">{metaDescription.length}/160</span>
+                          </label>
+                          <textarea
+                            name="meta_description"
+                            value={metaDescription}
+                            onChange={(event) => setMetaDescription(event.currentTarget.value)}
+                            rows={3}
+                            maxLength={180}
+                            placeholder="Short Google search description for this product."
+                            className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:border-rose-500 focus:outline-none focus:ring-1 focus:ring-rose-500"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-bold text-zinc-900 mb-1">Focus Keywords</label>
+                          <input name="meta_keywords" value={metaKeywords} onChange={(event) => setMetaKeywords(event.currentTarget.value)} type="text" placeholder="ssd sri lanka, samsung nvme, pc garage" className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:border-rose-500 focus:outline-none focus:ring-1 focus:ring-rose-500" />
+                        </div>
+
+                        <div className="rounded-lg border border-zinc-200 bg-white p-3">
+                          <div className="truncate text-sm font-bold text-blue-700">
+                            {seoTitle || productName || 'Product SEO title'}
+                          </div>
+                          <div className="mt-0.5 truncate text-xs font-medium text-green-700">
+                            pcgarage.lk/product/{slugValue || 'product-slug'}
+                          </div>
+                          <p className="mt-1 line-clamp-2 text-xs leading-5 text-zinc-500">
+                            {metaDescription || 'Meta description preview will appear in search results when available.'}
+                          </p>
+                        </div>
+                      </div>
                     </div>
 
                     <label className="sm:col-span-2 inline-flex items-center gap-2 text-sm font-bold text-zinc-700">

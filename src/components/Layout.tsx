@@ -1,5 +1,5 @@
 import { Link, Outlet, useLocation } from 'react-router-dom';
-import { Menu, Search, ShoppingCart, X, Cpu, ChevronRight, Home as HomeIcon, Package, Grid3X3 } from 'lucide-react';
+import { Menu, Search, ShoppingCart, X, ChevronRight, Home as HomeIcon, Package, Grid3X3, Moon, Sun } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useCartStore } from '../store/cartStore';
 
@@ -7,6 +7,10 @@ export function Layout() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [theme, setTheme] = useState<'dark' | 'light'>(() => {
+    if (typeof window === 'undefined') return 'dark';
+    return window.localStorage.getItem('pc-garage-theme') === 'light' ? 'light' : 'dark';
+  });
   const cartItems = useCartStore((state) => state.items);
   const cartCount = cartItems.reduce((acc, item) => acc + item.quantity, 0);
   const location = useLocation();
@@ -22,6 +26,11 @@ export function Layout() {
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme;
+    window.localStorage.setItem('pc-garage-theme', theme);
+  }, [theme]);
 
   useEffect(() => {
     setIsMenuOpen(false);
@@ -94,18 +103,14 @@ export function Layout() {
                 {searchOpen ? <X size={17} /> : <Search size={17} />}
               </button>
 
-              <Link
-                to="/cart"
-                aria-label="Open cart"
+              <button
+                type="button"
+                onClick={() => setTheme((value) => (value === 'dark' ? 'light' : 'dark'))}
+                aria-label={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
                 className="header-icon-btn"
               >
-                <ShoppingCart size={17} />
-                {cartCount > 0 && (
-                  <span className="header-cart-badge">
-                    {cartCount}
-                  </span>
-                )}
-              </Link>
+                {theme === 'dark' ? <Sun size={17} /> : <Moon size={17} />}
+              </button>
 
               <button
                 id="mobile-menu-btn"
@@ -212,7 +217,7 @@ export function Layout() {
           margin-top: auto;
           background:
             linear-gradient(180deg, rgba(255,255,255,0.025), rgba(255,255,255,0)),
-            #070708;
+            var(--footer-bg);
           border-top: 1px solid var(--border-subtle);
         }
 
@@ -362,7 +367,7 @@ export function Layout() {
           padding: 0.45rem;
           border: 1px solid rgba(255,255,255,0.12);
           border-radius: 1.15rem;
-          background: rgba(12,12,14,0.96);
+          background: var(--header-panel-bg);
           box-shadow: 0 18px 44px rgba(15,23,42,0.18);
           backdrop-filter: blur(18px);
           -webkit-backdrop-filter: blur(18px);
@@ -414,7 +419,7 @@ export function Layout() {
           justify-content: center;
           background: #ef4444;
           color: #ffffff;
-          border: 2px solid #ffffff;
+          border: 2px solid var(--bg-surface);
           font-size: 0.58rem;
           font-weight: 900;
         }
