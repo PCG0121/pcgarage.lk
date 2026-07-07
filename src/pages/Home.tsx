@@ -33,17 +33,18 @@ const heroSlides = [
     label: 'Laptop diagnostics',
   },
   {
-    image: '/hero/hero-2.jpg',
+    image: 'https://ik.imagekit.io/pcg/hero/mobile%20/Untitled%20(1080%20x%201440%20px).webp',
     mobileImage: 'https://ik.imagekit.io/pcg/hero/mobile%20/Untitled%20(1080%20x%201440%20px).webp',
     label: 'PC parts and accessories',
   },
   {
-    image: '/hero/hero-3.jpg',
-    mobileImage: '/hero/mobile-hero-3.jpg',
+    image: 'https://ik.imagekit.io/pcg/hero/mobile%20/banner/Untitled-design.jpg',
+    mobileImage: 'https://ik.imagekit.io/pcg/hero/mobile%20/banner/Untitled-design.jpg',
     label: 'Repair bench service',
   },
 ];
 
+const heroFallbackImage = heroSlides[0].image;
 const mobileAfterHeroBanner = 'https://ik.imagekit.io/pcg/hero/mobile%20/banner/Untitled-design.jpg';
 
 function Toast({ message, onClose }: { message: string; onClose: () => void }) {
@@ -141,9 +142,19 @@ export function Home() {
     const updateHeroMode = () => setIsMobileHero(mediaQuery.matches);
 
     updateHeroMode();
-    mediaQuery.addEventListener('change', updateHeroMode);
+    if (mediaQuery.addEventListener) {
+      mediaQuery.addEventListener('change', updateHeroMode);
+    } else {
+      mediaQuery.addListener(updateHeroMode);
+    }
 
-    return () => mediaQuery.removeEventListener('change', updateHeroMode);
+    return () => {
+      if (mediaQuery.removeEventListener) {
+        mediaQuery.removeEventListener('change', updateHeroMode);
+      } else {
+        mediaQuery.removeListener(updateHeroMode);
+      }
+    };
   }, []);
 
   useEffect(() => {
@@ -212,12 +223,21 @@ export function Home() {
                 border: '1px solid var(--border-subtle)',
                 overflow: 'hidden',
                 position: 'relative',
-                backgroundImage: `linear-gradient(90deg, rgba(5,5,6,0.18), rgba(5,5,6,0.08)), url("${currentHeroImage}")`,
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-                transition: 'background-image 0.45s ease',
+                backgroundColor: '#060607',
               }}
             >
+              <img
+                key={currentHeroImage}
+                src={currentHeroImage}
+                alt={currentHeroSlide.label}
+                className="hero-slide-img"
+                onError={(event) => {
+                  if (event.currentTarget.src !== heroFallbackImage) {
+                    event.currentTarget.src = heroFallbackImage;
+                  }
+                }}
+              />
+              <div className="hero-slide-shade" />
               <div className="hero-carousel-controls" aria-label="Hero image carousel">
                 <div style={{ display: 'flex', gap: '0.5rem' }}>
                   <button type="button" onClick={showPreviousHeroSlide} aria-label="Previous hero image" className="hero-carousel-btn">
@@ -414,6 +434,20 @@ export function Home() {
         .mobile-after-hero-banner {
           display: none;
         }
+        .hero-slide-img {
+          width: 100%;
+          height: 100%;
+          display: block;
+          object-fit: cover;
+          object-position: center;
+          transition: opacity 0.28s ease;
+        }
+        .hero-slide-shade {
+          position: absolute;
+          inset: 0;
+          background: linear-gradient(90deg, rgba(5,5,6,0.18), rgba(5,5,6,0.08));
+          pointer-events: none;
+        }
         @media (max-width: 980px) {
           .electro-hero-grid, .hero-grid, .service-grid { grid-template-columns: 1fr !important; }
           .electro-departments { order: 2; }
@@ -444,10 +478,13 @@ export function Home() {
           .electro-main-slide {
             min-height: 0 !important;
             aspect-ratio: 3 / 4 !important;
-            background-size: contain !important;
-            background-repeat: no-repeat !important;
-            background-position: center !important;
             background-color: #060607 !important;
+          }
+          .hero-slide-img {
+            object-fit: contain;
+          }
+          .hero-slide-shade {
+            background: linear-gradient(180deg, rgba(5,5,6,0.02), rgba(5,5,6,0.16));
           }
           .hero-carousel-controls {
             left: 1.35rem !important;
