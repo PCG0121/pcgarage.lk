@@ -1317,16 +1317,7 @@ export function Home() {
           }
           .repair-points { gap: 0.55rem; }
           .koko-banner-grid {
-            grid-template-columns: 1fr;
-          }
-          .koko-banner {
-            min-height: 4.9rem;
-            aspect-ratio: 1950 / 760;
-            background-image: url("${desktopKokoBanner}") !important;
-          }
-          .koko-banner-extra {
-            display: block;
-            background-image: url("${desktopKokoSideBanner}") !important;
+            display: none;
           }
           .store-products-panel {
             padding: 1rem;
