@@ -66,7 +66,8 @@ const services = [
   { icon: Wrench, title: 'Thermal Cleaning', desc: 'Deep clean, paste replacement, and tune-ups.' },
 ];
 
-const desktopHeroSecurityImage = 'https://ik.imagekit.io/pcg/Website/hero/Untitled%20design%20(8).webp';
+const desktopHeroLaptopImage = 'https://ik.imagekit.io/pcg/Website/hero/hero1?updatedAt=1783423943542';
+const desktopHeroSecurityImage = 'https://ik.imagekit.io/pcg/Website/hero/Untitled%20design%20(8).webp?updatedAt=1783424118191';
 const desktopKokoBanner = 'https://ik.imagekit.io/pcg/hero/mobile%20/banner/koko_banner.png';
 const desktopKokoSideBanner = 'https://ik.imagekit.io/pcg/hero/mobile%20/banner/ChatGPT%20Image%20Jun%209,%202026,%2001_06_47%20PM.webp';
 const mobileHeroLaptopImage = 'https://ik.imagekit.io/pcg/Website/hero/mobile%20/Quality%20laptop%20parts%20pc%20garage?updatedAt=1783423943541';
@@ -75,12 +76,12 @@ const mobileAfterHeroBanner = desktopKokoBanner;
 
 const heroSlides = [
   {
-    image: desktopHeroSecurityImage,
+    image: desktopHeroLaptopImage,
     mobileImage: mobileHeroLaptopImage,
     label: 'Laptop diagnostics',
   },
   {
-    image: desktopKokoSideBanner,
+    image: desktopHeroSecurityImage,
     mobileImage: mobileHeroPartsImage,
     label: 'PC parts and accessories',
   },
