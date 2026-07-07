@@ -319,7 +319,7 @@ export function AdminProducts() {
               </button>
             </div>
 
-            <form onSubmit={handleSaveProduct} className="p-6 overflow-y-auto">
+            <form onSubmit={handleSaveProduct} className="admin-product-form p-6 overflow-y-auto">
               <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
                 <div className="space-y-4">
                   <div className="grid gap-4 sm:grid-cols-2">
@@ -434,6 +434,26 @@ export function AdminProducts() {
                 </button>
               </div>
             </form>
+
+            <style>{`
+              .admin-product-form input:not([type="checkbox"]),
+              .admin-product-form textarea,
+              .admin-product-form select {
+                background-color: #ffffff;
+                color: #18181b;
+              }
+
+              .admin-product-form input::placeholder,
+              .admin-product-form textarea::placeholder {
+                color: #a1a1aa;
+                opacity: 1;
+              }
+
+              .admin-product-form select option {
+                background-color: #ffffff;
+                color: #18181b;
+              }
+            `}</style>
           </div>
         </div>
       )}

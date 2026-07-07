@@ -133,6 +133,11 @@ function productToRow(product: ProductInput) {
   };
 }
 
+function productToLegacyRow(product: ProductInput) {
+  const { gallery_image_urls: _galleryImageUrls, ...row } = productToRow(product);
+  return row;
+}
+
 export const useProductStore = create<ProductState>()((set, get) => ({
   products: hasSupabaseConfig ? [] : mockProducts,
   categories: hasSupabaseConfig ? [] : fallbackCategoryRecords,
@@ -300,7 +305,14 @@ export const useProductStore = create<ProductState>()((set, get) => ({
     }
 
     const { error } = await supabase.from('products').insert(productToRow(product));
-    if (error) throw error;
+
+    if (isMissingGalleryColumn(error)) {
+      const retry = await supabase.from('products').insert(productToLegacyRow(product));
+      if (retry.error) throw retry.error;
+    } else if (error) {
+      throw error;
+    }
+
     await get().loadAdminProducts();
   },
 
@@ -324,7 +336,14 @@ export const useProductStore = create<ProductState>()((set, get) => ({
     }
 
     const { error } = await supabase.from('products').update(productToRow(product)).eq('id', productId);
-    if (error) throw error;
+
+    if (isMissingGalleryColumn(error)) {
+      const retry = await supabase.from('products').update(productToLegacyRow(product)).eq('id', productId);
+      if (retry.error) throw retry.error;
+    } else if (error) {
+      throw error;
+    }
+
     await get().loadAdminProducts();
   },
 

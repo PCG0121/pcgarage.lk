@@ -164,89 +164,189 @@ export function Layout() {
         })}
       </nav>
 
-      <footer className="site-footer" style={{
-        background: '#080809',
-        borderTop: '1px solid var(--border-subtle)',
-        marginTop: 'auto',
-      }}>
-        <div style={{
-          maxWidth: '80rem',
-          margin: '0 auto',
-          padding: '2.7rem 1.5rem',
-          display: 'grid',
-          gridTemplateColumns: 'minmax(0, 1.5fr) repeat(3, minmax(9rem, 1fr))',
-          gap: '2rem',
-        }} className="footer-grid">
-          <div>
-            <Link to="/" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.75rem', textDecoration: 'none', marginBottom: '1rem' }}>
-              <div style={{
-                width: '2.3rem',
-                height: '2.3rem',
-                borderRadius: '0.7rem',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                background: 'linear-gradient(135deg, #ef4444, #7f1d1d)',
-              }}>
-                <Cpu size={18} color="white" />
-              </div>
-              <div style={{ fontWeight: 900, color: 'var(--text-primary)' }}>PC Garage</div>
+      <footer className="site-footer">
+        <div className="footer-shell">
+          <div className="footer-main">
+            <Link to="/" className="footer-brand" aria-label="PC Garage home">
+              <span className="footer-brand-mark">
+                <img src="/pc-garage-logo.png" alt="" aria-hidden="true" />
+              </span>
+              <span>
+                <strong>PC Garage</strong>
+                <small>Kurunegala, Sri Lanka</small>
+              </span>
             </Link>
-            <p style={{ color: 'var(--text-muted)', fontSize: '0.86rem', lineHeight: 1.7, maxWidth: '26rem', margin: 0 }}>
-              PC components, laptop repairs, upgrades, and reliable service from Kurunegala.
+
+            <p className="footer-copy">
+              Laptop parts, repairs, upgrades, and island-wide delivery with practical support.
             </p>
+
+            <div className="footer-contact">
+              <a href="tel:+94700000000">+94 70 000 0000</a>
+              <a href="mailto:pcgarage012@gmail.com">pcgarage012@gmail.com</a>
+            </div>
           </div>
 
-          <div>
-            <h4 className="section-label" style={{ margin: '0 0 1rem' }}>Shop</h4>
+          <nav className="footer-links" aria-label="Footer navigation">
             {[
+              ['Home', '/'],
               ['Products', '/products'],
               ['Categories', '/categories'],
               ['Cart', '/cart'],
             ].map(([label, to]) => (
-              <Link key={to} to={to} style={{ display: 'block', color: 'var(--text-muted)', textDecoration: 'none', fontSize: '0.86rem', marginBottom: '0.65rem' }}>
+              <Link key={to} to={to}>
                 {label}
               </Link>
             ))}
-          </div>
-
-          <div>
-            <h4 className="section-label" style={{ margin: '0 0 1rem' }}>Services</h4>
-            {['Laptop repair', 'SSD upgrades', 'Battery replacement'].map((label) => (
-              <div key={label} style={{ color: 'var(--text-muted)', fontSize: '0.86rem', marginBottom: '0.65rem' }}>
-                {label}
-              </div>
-            ))}
-          </div>
-
-          <div>
-            <h4 className="section-label" style={{ margin: '0 0 1rem' }}>Contact</h4>
-            <div style={{ color: 'var(--text-muted)', fontSize: '0.86rem', lineHeight: 1.8 }}>
-              Kurunegala, Sri Lanka<br />
-              +94 70 000 0000<br />
-              pcgarage012@gmail.com
-            </div>
-          </div>
+          </nav>
         </div>
 
-        <div style={{
-          maxWidth: '80rem',
-          margin: '0 auto',
-          padding: '1rem 1.5rem 1.35rem',
-          borderTop: '1px solid var(--border-subtle)',
-          display: 'flex',
-          justifyContent: 'space-between',
-          gap: '1rem',
-          flexWrap: 'wrap',
-          color: 'var(--text-muted)',
-          fontSize: '0.78rem',
-        }}>
-          <span>Copyright {new Date().getFullYear()} PC Garage. All rights reserved.</span>
-          <span>WhatsApp orders and island-wide delivery available</span>
+        <div className="footer-bottom">
+          <span>Copyright {new Date().getFullYear()} PC Garage.</span>
+          <span>Genuine parts. Clear repairs. Fast delivery.</span>
         </div>
       </footer>
 
       <style>{`
+        .site-footer {
+          margin-top: auto;
+          background:
+            linear-gradient(180deg, rgba(255,255,255,0.025), rgba(255,255,255,0)),
+            #070708;
+          border-top: 1px solid var(--border-subtle);
+        }
+
+        .footer-shell {
+          width: min(80rem, calc(100% - 3rem));
+          margin: 0 auto;
+          padding: 2rem 0 1.35rem;
+          display: grid;
+          grid-template-columns: minmax(0, 1fr) auto;
+          align-items: start;
+          gap: 2rem;
+        }
+
+        .footer-main {
+          min-width: 0;
+        }
+
+        .footer-brand {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.75rem;
+          color: #ffffff;
+          text-decoration: none;
+        }
+
+        .footer-brand-mark {
+          width: 3.5rem;
+          height: 2.4rem;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          overflow: hidden;
+        }
+
+        .footer-brand-mark img {
+          width: 100%;
+          height: 100%;
+          display: block;
+          object-fit: contain;
+          filter: drop-shadow(0 8px 18px rgba(0,0,0,0.34));
+        }
+
+        .footer-brand strong,
+        .footer-brand small {
+          display: block;
+        }
+
+        .footer-brand strong {
+          font-size: 0.98rem;
+          font-weight: 950;
+          line-height: 1.15;
+        }
+
+        .footer-brand small {
+          margin-top: 0.16rem;
+          color: var(--text-muted);
+          font-size: 0.72rem;
+          font-weight: 750;
+        }
+
+        .footer-copy {
+          max-width: 34rem;
+          margin: 1rem 0 0;
+          color: var(--text-muted);
+          font-size: 0.86rem;
+          line-height: 1.7;
+        }
+
+        .footer-contact {
+          margin-top: 1.1rem;
+          display: flex;
+          flex-wrap: wrap;
+          gap: 0.55rem;
+        }
+
+        .footer-contact a,
+        .footer-links a {
+          color: var(--text-secondary);
+          text-decoration: none;
+          transition: color 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+        }
+
+        .footer-contact a {
+          min-height: 2.2rem;
+          display: inline-flex;
+          align-items: center;
+          padding: 0 0.85rem;
+          border: 1px solid var(--border-subtle);
+          border-radius: 999px;
+          background: rgba(255,255,255,0.035);
+          font-size: 0.78rem;
+          font-weight: 800;
+        }
+
+        .footer-contact a:hover,
+        .footer-links a:hover {
+          color: #ffffff;
+          border-color: rgba(239,68,68,0.45);
+          background: rgba(239,68,68,0.10);
+        }
+
+        .footer-links {
+          display: flex;
+          flex-wrap: wrap;
+          justify-content: flex-end;
+          gap: 0.45rem;
+        }
+
+        .footer-links a {
+          min-height: 2.35rem;
+          display: inline-flex;
+          align-items: center;
+          padding: 0 0.9rem;
+          border: 1px solid transparent;
+          border-radius: 999px;
+          font-size: 0.78rem;
+          font-weight: 850;
+        }
+
+        .footer-bottom {
+          width: min(80rem, calc(100% - 3rem));
+          margin: 0 auto;
+          padding: 1rem 0 1.2rem;
+          border-top: 1px solid var(--border-subtle);
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 1rem;
+          flex-wrap: wrap;
+          color: var(--text-muted);
+          font-size: 0.75rem;
+          font-weight: 700;
+        }
+
         .mobile-bottom-nav {
           display: none;
           position: fixed;
@@ -336,7 +436,20 @@ export function Layout() {
         }
 
         @media (max-width: 820px) {
-          .footer-grid { grid-template-columns: 1fr !important; }
+          .footer-shell {
+            width: calc(100% - 2rem);
+            grid-template-columns: 1fr;
+            gap: 1.25rem;
+            padding-top: 1.6rem;
+          }
+
+          .footer-links {
+            justify-content: flex-start;
+          }
+
+          .footer-bottom {
+            width: calc(100% - 2rem);
+          }
         }
       `}</style>
     </div>

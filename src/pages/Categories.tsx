@@ -16,6 +16,16 @@ const categoryIcons: Record<string, any> = {
   'Accessories': Laptop,
 };
 
+const categoryImages: Record<string, string> = {
+  'SSD': '/category/ssd.png',
+  'RAM': '/category/ram.png',
+  'Displays': '/category/displays.png',
+  'Laptop Batteries': '/category/battery.png',
+  'Keyboards': '/category/keyboards.png',
+  'Chargers': '/category/chargers.png',
+  'Printers': '/category/printers.png',
+};
+
 const categoryColors: Record<string, { bg: string; border: string; text: string; glow: string }> = {
   'Laptop Batteries': { bg: 'rgba(239,68,68,0.14)', border: 'rgba(239,68,68,0.32)', text: '#ef4444', glow: 'rgba(239,68,68,0.12)' },
   'Keyboards':        { bg: 'rgba(255,255,255,0.08)', border: 'rgba(255,255,255,0.20)', text: '#ffffff', glow: 'rgba(255,255,255,0.08)' },
@@ -109,6 +119,8 @@ export function Categories() {
               const Icon = categoryIcons[catName] || Laptop;
               const colors = categoryColors[catName] || { bg: 'rgba(239,68,68,0.1)', border: 'rgba(239,68,68,0.2)', text: '#ef4444', glow: 'rgba(239,68,68,0.1)' };
               const count = products.filter((p) => p.category === catName).length;
+              const productImage = products.find((product) => product.category === catName)?.image_url;
+              const categoryImage = categoryImages[catName] || productImage;
 
               return (
                 <Link
@@ -127,16 +139,25 @@ export function Categories() {
                   className="cat-link"
                   data-color={colors.glow}
                 >
-                  {/* Icon */}
                   <div style={{
-                    width: '3.5rem', height: '3.5rem', flexShrink: 0,
+                    width: '4rem', height: '4rem', flexShrink: 0,
                     background: colors.bg,
                     border: `1px solid ${colors.border}`,
                     borderRadius: '1rem',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     transition: 'all 0.3s ease',
+                    overflow: 'hidden',
                   }}>
-                    <Icon size={22} color={colors.text} />
+                    {categoryImage ? (
+                      <img
+                        src={categoryImage}
+                        alt=""
+                        aria-hidden="true"
+                        className="category-card-image"
+                      />
+                    ) : (
+                      <Icon size={22} color={colors.text} />
+                    )}
                   </div>
 
                   {/* Text */}
@@ -202,6 +223,13 @@ export function Categories() {
           border-color: rgba(239,68,68,0.3) !important;
           transform: translateY(-4px) !important;
           box-shadow: 0 0 35px rgba(239,68,68,0.1), 0 20px 40px rgba(0,0,0,0.4) !important;
+        }
+        .category-card-image {
+          width: 86%;
+          height: 86%;
+          object-fit: contain;
+          object-position: center;
+          filter: drop-shadow(0 10px 14px rgba(0,0,0,0.34));
         }
         .cat-link:hover .cat-line { transform: scaleX(1) !important; }
         .cat-link:hover .cat-arrow { color: var(--text-primary) !important; transform: translateX(4px); }
