@@ -72,7 +72,7 @@ const desktopKokoBanner = 'https://ik.imagekit.io/pcg/hero/mobile%20/banner/koko
 const desktopKokoSideBanner = 'https://ik.imagekit.io/pcg/hero/mobile%20/banner/ChatGPT%20Image%20Jun%209,%202026,%2001_06_47%20PM.webp';
 const mobileHeroLaptopImage = 'https://ik.imagekit.io/pcg/Website/hero/mobile%20/Quality%20laptop%20parts%20pc%20garage?updatedAt=1783423943541';
 const mobileHeroPartsImage = 'https://ik.imagekit.io/pcg/Website/hero/mobile%20/Untitled%20(1080%20x%201440%20px).webp?updatedAt=1783423943539';
-const mobileAfterHeroBanner = desktopKokoBanner;
+const mobileAfterHeroBanner = desktopKokoSideBanner;
 
 const heroSlides = [
   {
@@ -1318,16 +1318,7 @@ export function Home() {
           }
           .repair-points { gap: 0.55rem; }
           .koko-banner-grid {
-            grid-template-columns: 1fr;
-          }
-          .koko-banner {
             display: none;
-          }
-          .koko-banner.koko-banner-extra {
-            display: block;
-            min-height: 4.9rem;
-            aspect-ratio: 1950 / 760;
-            background-image: url("${desktopKokoSideBanner}") !important;
           }
           .store-products-panel {
             padding: 1rem;
