@@ -69,7 +69,7 @@ const services = [
 const desktopHeroLaptopImage = 'https://ik.imagekit.io/pcg/Website/hero/hero1?updatedAt=1783423943542';
 const desktopHeroSecurityImage = 'https://ik.imagekit.io/pcg/Website/hero/Untitled%20design%20(8).webp?updatedAt=1783424118191';
 const desktopKokoBanner = 'https://ik.imagekit.io/pcg/hero/mobile%20/banner/koko_banner.png';
-const desktopKokoSideBanner = 'https://ik.imagekit.io/pcg/hero/mobile%20/banner/ChatGPT%20Image%20Jun%209,%202026,%2001_06_47%20PM.webp';
+const desktopKokoSideBanner = 'https://ik.imagekit.io/pcg/Website/hero/mobile%20/banner/ChatGPT%20Image%20Jun%209,%202026,%2001_06_47%20PM.webp?updatedAt=1783424118191';
 const mobileHeroLaptopImage = 'https://ik.imagekit.io/pcg/Website/hero/mobile%20/Quality%20laptop%20parts%20pc%20garage?updatedAt=1783423943541';
 const mobileHeroPartsImage = 'https://ik.imagekit.io/pcg/Website/hero/mobile%20/Untitled%20(1080%20x%201440%20px).webp?updatedAt=1783423943539';
 const mobileAfterHeroBanner = desktopKokoSideBanner;
@@ -409,10 +409,9 @@ export function Home() {
         to="/products"
         className="mobile-after-hero-banner"
         aria-label="Browse PC Garage payment offers"
-        style={{
-          backgroundImage: `url("${mobileAfterHeroBanner}")`,
-        }}
-      />
+      >
+        <img src={mobileAfterHeroBanner} alt="" aria-hidden="true" />
+      </Link>
 
       <section className="commerce-showcase">
         <div className="commerce-shell">
@@ -1248,11 +1247,15 @@ export function Home() {
             border: 1px solid var(--border-subtle);
             border-radius: 0.9rem;
             background-color: var(--bg-card);
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
             overflow: hidden;
             box-shadow: var(--shadow-card);
+          }
+          .mobile-after-hero-banner img {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
           }
           .hero-modern { padding: 1rem !important; }
           .electro-departments { display: none !important; }
